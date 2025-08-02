@@ -1,26 +1,54 @@
 // components/BottomNav.js
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'react-native';
 
 const BottomNav = ({ active = 'home' }) => {
-  const getIconColor = (name) => (active === name ? '#6C5CE7' : '#9E9E9E');
+  const getIconColor = (name) => (active === name ? '#8663EC' : '#000000');
   const isActive = (name) => (active === name ? styles.activeNavItem : null);
 
   return (
     <View style={styles.bottomNav}>
       <TouchableOpacity style={[styles.navItem, isActive('time')]}>
-        <Ionicons name="time-outline" size={24} color={getIconColor('time')} />
+        <Image
+          source={require('../../assets/navbar/NavNotifications.png')}
+          style={[
+            styles.navIcon,
+            { tintColor: getIconColor('time') }
+          ]}
+          resizeMode="contain"
+        />      
       </TouchableOpacity>
       <TouchableOpacity style={[styles.navItem, isActive('home')]}>
-        <Ionicons name="home" size={24} color={getIconColor('home')} />
-      </TouchableOpacity>
+        <Image
+            source={require('../../assets/navbar/NavHome.png')}
+            style={[
+              styles.navIcon,
+              { tintColor: getIconColor('home') }
+            ]}
+            resizeMode="contain"
+          />      
+        </TouchableOpacity>
       <TouchableOpacity style={[styles.navItem, isActive('star')]}>
-        <Ionicons name="star-outline" size={24} color={getIconColor('star')} />
-      </TouchableOpacity>
+        <Image
+            source={require('../../assets/navbar/NavStar.png')}
+            style={[
+              styles.navIcon,
+              { tintColor: getIconColor('star') }
+            ]}
+            resizeMode="contain"
+          />      
+        </TouchableOpacity>
       <TouchableOpacity style={[styles.navItem, isActive('settings')]}>
-        <Ionicons name="settings-outline" size={24} color={getIconColor('settings')} />
-      </TouchableOpacity>
+        <Image
+            source={require('../../assets/navbar/NavControls.png')}
+            style={[
+              styles.navIcon,
+              { tintColor: getIconColor('settings') }
+            ]}
+            resizeMode="contain"
+          />      
+        </TouchableOpacity>
     </View>
   );
 };
@@ -30,13 +58,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'white',
     paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     justifyContent: 'space-around',
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: '#E5E7EB',
   },
   navItem: {
-    padding: 10,
+    padding: 8,
+  },
+  navIcon: {
+    width: 36,
+    height: 36,
   },
   activeNavItem: {
     backgroundColor: 'rgba(108, 92, 231, 0.1)',
