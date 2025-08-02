@@ -22,20 +22,12 @@ const SearchBar = ({ value, onChangeText, placeholder = "Search..." }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: 'white',
-    marginTop: -15,
+    paddingHorizontal: 0,
+    paddingVertical: 3,
+    backgroundColor: '#F3F4F6',
+    marginTop: 15,
     marginHorizontal: 20,
     borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   searchBar: {
     flexDirection: 'row',
@@ -47,11 +39,12 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 10,
+    color: '#ADAEBC',
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: '#ADAEBC',
   },
 });
 
