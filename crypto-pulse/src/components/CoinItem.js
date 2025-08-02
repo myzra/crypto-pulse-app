@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'react-native';
+
 
 const CoinItem = ({ coin }) => (
   <View style={styles.coinItem}>
@@ -19,26 +20,32 @@ const CoinItem = ({ coin }) => (
         <Text style={styles.coinPrice}>{coin.price}</Text>
         <Text style={[
           styles.coinChange,
-          { color: coin.isPositive ? '#4CAF50' : '#F44336' }
+          { color: coin.isPositive ? '#10B981' : '#EF4444' }
         ]}>
           {coin.change}
         </Text>
       </View>
       
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.starButton}>
-          <Ionicons name="star-outline" size={20} color="#9E9E9E" />
-        </TouchableOpacity>
-        <TouchableOpacity style={[
-          styles.notificationButton,
-          coin.isPositive ? styles.addButton : styles.checkButton
-        ]}>
-          <Ionicons 
-            name={coin.isPositive ? "add" : "checkmark"} 
-            size={16} 
-            color="white" 
-          />
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.starButton}>
+        <Image
+          source={require('../../assets/buttons/FavStar.png')} // ToDo: add purple filled out star png
+          style={{ width: 24, height: 24, tintColor: '#8663EC' }}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={[
+        styles.notificationButton,
+        coin.isPositive ? styles.addButton : styles.checkButton
+      ]}>
+        <Image
+          source={coin.isPositive
+            ? require('../../assets/buttons/NotChecked.png') // ToDo: add different button png
+            : require('../../assets/buttons/Checkmark.png')}
+          style={{ width: 20, height: 20, }}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
       </View>
     </View>
   </View>
@@ -53,14 +60,13 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1},
+    shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
   coinLeft: {
     flexDirection: 'row',
@@ -86,12 +92,12 @@ const styles = StyleSheet.create({
   coinName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#1F2937',
     marginBottom: 2,
   },
   coinSymbol: {
     fontSize: 14,
-    color: '#9E9E9E',
+    color: '#6B7280',
   },
   coinRight: {
     flexDirection: 'row',
@@ -104,11 +110,11 @@ const styles = StyleSheet.create({
   coinPrice: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#1F2937',
     marginBottom: 2,
   },
   coinChange: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
   },
   actionButtons: {
@@ -127,10 +133,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButton: {
-    backgroundColor: '#6C5CE7',
+    backgroundColor: 'rgba(99, 102, 241, 0.1)', // #6366F1 with 10% opacity
   },
   checkButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#8663EC',
   },
 });
 
