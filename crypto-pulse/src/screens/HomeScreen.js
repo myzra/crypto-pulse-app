@@ -37,7 +37,7 @@ const HomeScreen = () => {
 
       {/* Popular Coins Section */}
       <CoinList data={cryptoData} title="Popular Coins" />
-
+      
       {/* Bottom Navigation */}
       <BottomNav active="home" />
     </SafeAreaView>
@@ -47,7 +47,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
