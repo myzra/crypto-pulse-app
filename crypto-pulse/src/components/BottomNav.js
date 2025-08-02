@@ -64,11 +64,11 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E7EB',
   },
   navItem: {
-    padding: 8,
+    padding: 5,
   },
   navIcon: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
   },
   activeNavItem: {
     backgroundColor: 'rgba(108, 92, 231, 0.1)',
