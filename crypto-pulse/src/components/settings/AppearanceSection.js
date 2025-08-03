@@ -1,14 +1,33 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const AppearanceSection = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [animation] = useState(new Animated.Value(0));
 
   const handleDarkModeToggle = () => {
-    setIsDarkMode(prev => !prev);
-    console.log('Dark mode toggled:', !isDarkMode);
+    const newValue = !isDarkMode;
+    setIsDarkMode(newValue);
+    
+    Animated.timing(animation, {
+      toValue: newValue ? 1 : 0,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+    
+    console.log('Dark mode toggled:', newValue);
   };
+
+  const translateX = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [3, 30], // Adjust based on your track width
+  });
+
+  const trackColor = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#E5E7EB', '#8663EC'], // Gray to green
+  });
 
   return (
     <View style={styles.section}>
@@ -23,13 +42,16 @@ const AppearanceSection = () => {
             <Text style={styles.appearanceSubtitle}>Enable Dark Mode</Text>
           </View>
         </View>
-        <Switch
-          value={isDarkMode}
-          onValueChange={handleDarkModeToggle}
-          trackColor={{ false: '#E5E5EA', true: '#34C759' }}
-          thumbColor="#FFF"
-          style={styles.switch}
-        />
+        <TouchableOpacity style={styles.switchContainer} onPress={handleDarkModeToggle}>
+          <Animated.View style={[styles.switchTrack, { backgroundColor: trackColor }]}>
+            <Animated.View 
+              style={[
+                styles.switchThumb,
+                { transform: [{ translateX }] }
+              ]} 
+            />
+          </Animated.View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -41,10 +63,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 20,
+    color: '#1F2937',
+    marginBottom: 15,
   },
   appearanceItem: {
     flexDirection: 'row',
@@ -80,15 +102,37 @@ const styles = StyleSheet.create({
   appearanceTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#1F2937',
     marginBottom: 2,
   },
   appearanceSubtitle: {
     fontSize: 14,
     color: '#8E8E93',
   },
-  switch: {
-    transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+  switchContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  switchTrack: {
+    width: 60,
+    height: 30,
+    borderRadius: 17,
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  switchThumb: {
+    width: 20,
+    height: 20,
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    position: 'absolute',
+    left: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
 });
 
