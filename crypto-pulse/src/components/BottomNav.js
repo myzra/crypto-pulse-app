@@ -6,8 +6,7 @@ const BottomNav = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Der aktuelle Screenname (z. B. "Home" oder "Favorites")
-  const active = route.name.toLowerCase(); // z. B. "home" oder "favorites"
+  const active = route.name.toLowerCase();
 
   const getIconColor = (name) => (active === name ? '#8663EC' : '#000000');
   const isActive = (name) => (active === name ? styles.activeNavItem : null);
@@ -51,9 +50,7 @@ const BottomNav = () => {
 
       <TouchableOpacity
         style={[styles.navItem, isActive('settings')]}
-        onPress={() => {
-          // navigation.navigate('Settings'); // Optional
-        }}
+        onPress={() => navigation.navigate('Settings')}
       >
         <Image
           source={require('../../assets/navbar/NavControls.png')}
