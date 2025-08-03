@@ -1,54 +1,66 @@
-// components/BottomNav.js
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-const BottomNav = ({ active = 'home' }) => {
+const BottomNav = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  // Der aktuelle Screenname (z. B. "Home" oder "Favorites")
+  const active = route.name.toLowerCase(); // z. B. "home" oder "favorites"
+
   const getIconColor = (name) => (active === name ? '#8663EC' : '#000000');
   const isActive = (name) => (active === name ? styles.activeNavItem : null);
 
   return (
     <View style={styles.bottomNav}>
-      <TouchableOpacity style={[styles.navItem, isActive('time')]}>
+      <TouchableOpacity
+        style={[styles.navItem, isActive('notifications')]}
+        onPress={() => {
+          // navigation.navigate('Notifications'); // Optional
+        }}
+      >
         <Image
           source={require('../../assets/navbar/NavNotifications.png')}
-          style={[
-            styles.navIcon,
-            { tintColor: getIconColor('time') }
-          ]}
+          style={[styles.navIcon, { tintColor: getIconColor('notifications') }]}
           resizeMode="contain"
-        />      
+        />
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.navItem, isActive('home')]}>
+
+      <TouchableOpacity
+        style={[styles.navItem, isActive('home')]}
+        onPress={() => navigation.navigate('Home')}
+      >
         <Image
-            source={require('../../assets/navbar/NavHome.png')}
-            style={[
-              styles.navIcon,
-              { tintColor: getIconColor('home') }
-            ]}
-            resizeMode="contain"
-          />      
-        </TouchableOpacity>
-      <TouchableOpacity style={[styles.navItem, isActive('star')]}>
+          source={require('../../assets/navbar/NavHome.png')}
+          style={[styles.navIcon, { tintColor: getIconColor('home') }]}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.navItem, isActive('favorites')]}
+        onPress={() => navigation.navigate('Favorites')}
+      >
         <Image
-            source={require('../../assets/navbar/NavStar.png')}
-            style={[
-              styles.navIcon,
-              { tintColor: getIconColor('star') }
-            ]}
-            resizeMode="contain"
-          />      
-        </TouchableOpacity>
-      <TouchableOpacity style={[styles.navItem, isActive('settings')]}>
+          source={require('../../assets/navbar/NavStar.png')}
+          style={[styles.navIcon, { tintColor: getIconColor('favorites') }]}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.navItem, isActive('settings')]}
+        onPress={() => {
+          // navigation.navigate('Settings'); // Optional
+        }}
+      >
         <Image
-            source={require('../../assets/navbar/NavControls.png')}
-            style={[
-              styles.navIcon,
-              { tintColor: getIconColor('settings') }
-            ]}
-            resizeMode="contain"
-          />      
-        </TouchableOpacity>
+          source={require('../../assets/navbar/NavControls.png')}
+          style={[styles.navIcon, { tintColor: getIconColor('settings') }]}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -65,6 +77,7 @@ const styles = StyleSheet.create({
   },
   navItem: {
     padding: 5,
+    borderRadius: 20,
   },
   navIcon: {
     width: 32,
@@ -72,7 +85,6 @@ const styles = StyleSheet.create({
   },
   activeNavItem: {
     backgroundColor: 'rgba(108, 92, 231, 0.1)',
-    borderRadius: 20,
   },
 });
 
