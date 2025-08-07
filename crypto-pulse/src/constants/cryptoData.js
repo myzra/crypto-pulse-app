@@ -6,7 +6,7 @@ export const cryptoData = [
     price: '$118,887',
     change: '+2.4%',
     isPositive: true,
-    color: '#F7931A',
+    color: '#FFEDD5',
     icon: '₿',
   },
   {
@@ -16,7 +16,7 @@ export const cryptoData = [
     price: '$3,348',
     change: '-1.2%',
     isPositive: false,
-    color: '#627EEA',
+    color: '#DBEAFE',
     icon: 'Ξ',
   },
   {
@@ -26,7 +26,7 @@ export const cryptoData = [
     price: '$0.80',
     change: '+2.97%',
     isPositive: true,
-    color: '#0033AD',
+    color: '#DBEAFE',
     icon: '₳',
   },
   {
@@ -36,7 +36,7 @@ export const cryptoData = [
     price: '$184.62',
     change: '+4.12%',
     isPositive: true,
-    color: '#00D18C',
+    color: '#E4DCFC',
     icon: '◎',
   },
   {
@@ -46,7 +46,7 @@ export const cryptoData = [
     price: '$3.13',
     change: '+3.82%',
     isPositive: true,
-    color: '#23292F',
+    color: '#D9D9D9',
     icon: 'X',
   },
   {
@@ -56,7 +56,7 @@ export const cryptoData = [
     price: '$3.82',
     change: '-2.11%',
     isPositive: false,
-    color: '#E6007A',
+    color: '#FCDCF6',
     icon: '●',
   },
   {
@@ -66,7 +66,7 @@ export const cryptoData = [
     price: '$23.40',
     change: '-3.07%',
     isPositive: false,
-    color: '#E84142',
+    color: '#FCDCDD',
     icon: '▲',
   },
   {
@@ -76,7 +76,7 @@ export const cryptoData = [
     price: '$0.21',
     change: '-4.94%',
     isPositive: false,
-    color: '#8247E5',
+    color: '#E8DCFC',
     icon: '⬟',
   },
   {
@@ -86,7 +86,7 @@ export const cryptoData = [
     price: '$0.32',
     change: '-3.60%',
     isPositive: false,
-    color: '#FF060A',
+    color: '#FCDCDC',
     icon: '▼',
   },
   {
@@ -96,7 +96,42 @@ export const cryptoData = [
     price: '$108.19',
     change: '-0.73%',
     isPositive: false,
-    color: '#BFBBBB',
+    color: '#DCEFFC',
     icon: 'Ł',
   },
 ];
+
+/*
+INSERT INTO public.coins (name, symbol, color)
+VALUES
+  ('Bitcoin', 'BTC', '#FFEDD5'),
+  ('Ethereum', 'ETH', '#DBEAFE'),
+  ('Tether', 'USDT', '#D4F1E8'),
+  ('BNB', 'BNB', '#F3BA2F'),
+  ('Solana', 'SOL', '#E4DCFC'),
+  ('USD Coin', 'USDC', '#D6E6FA'),
+  ('XRP', 'XRP', '#D9D9D9'),
+  ('Cardano', 'ADA', '#DBEAFE'),
+  ('Dogecoin', 'DOGE', '#F5E6A7'),
+  ('TRON', 'TRX', '#FF4B4B'),
+  ('Avalanche', 'AVAX', '#FAD4D4'),
+  ('Shiba Inu', 'SHIB', '#FFD1C7'),
+  ('Polkadot', 'DOT', '#FCE4EC'),
+  ('Chainlink', 'LINK', '#D6E6FA'),
+  ('Bitcoin Cash', 'BCH', '#D4F1E8'),
+  ('NEAR Protocol', 'NEAR', '#E6ECEF'),
+  ('Polygon', 'MATIC', '#E4DCFC'),
+  ('Litecoin', 'LTC', '#E6ECEF'),
+  ('Internet Computer', 'ICP', '#F5E6FA'),
+  ('Uniswap', 'UNI', '#FAD4E8'),
+  ('Dai', 'DAI', '#FFF8E1'),
+  ('Cosmos', 'ATOM', '#E6ECEF'),
+  ('Stellar', 'XLM', '#D6E6FA'),
+  ('Monero', 'XMR', '#FFE0CC'),
+  ('Ethereum Classic', 'ETC', '#D4F1E8'),
+  ('Hedera', 'HBAR', '#E6ECEF'),
+  ('Filecoin', 'FIL', '#D6E6FA'),
+  ('Aptos', 'APT', '#D9E8F5'),
+  ('Arbitrum', 'ARB', '#D6E6FA'),
+  ('Hyperliquid', 'HYPE', '#E4DCFC');
+*/

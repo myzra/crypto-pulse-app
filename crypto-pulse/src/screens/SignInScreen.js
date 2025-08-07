@@ -13,30 +13,81 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { authService } from '../services/api';
 
 const SignInScreen = ({ navigation, setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = () => {
+  const validateForm = () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
+      Alert.alert('Error', 'Email and password are required');
+      return false;
     }
-    
-    // Add your authentication logic here
-    // For demo purposes, we'll just set authenticated to true
-    setIsAuthenticated(true);
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return false;
+    }
+
+    return true;
   };
 
-  const handleGoogleSignIn = () => {
-    // Add Google sign-in logic here
-    Alert.alert('Google Sign In', 'Google sign-in functionality to be implemented');
+  const handleSignIn = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      const credentials = {
+        email: email,
+        password: password,
+      };
+
+      const result = await authService.signIn(credentials);
+
+      // Store user data in your app's state/context/AsyncStorage
+      // For now, we'll just set authentication to true
+      setIsAuthenticated(true);
+
+      Alert.alert(
+        'Welcome!', 
+        result.message || 'Sign in successful!',
+        [
+          { 
+            text: 'OK', 
+            onPress: () => {
+              // Navigation will be handled by AppNavigator based on isAuthenticated state
+            }
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.error('Sign in error:', error);
+      
+      let errorMessage = 'Sign in failed. Please try again.';
+      
+      if (error.message.includes('Invalid email or password')) {
+        errorMessage = 'Invalid email or password';
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleForgotPassword = () => {
-    Alert.alert('Forgot Password', 'Password reset functionality to be implemented');
+  const handleSignUp = () => {
+    navigation.navigate('SignUp');
   };
 
   return (
@@ -54,17 +105,17 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
           <View style={styles.content}>
             {/* Logo Section */}
             <View style={styles.logoContainer}>
-                <Image
-                    source={require('../../assets/cplogo.png')}
-                    style={styles.logoImage}
-                    />
-                <Text style={styles.logoText}>Crypto Pulse</Text>
+              <Image
+                source={require('../../assets/cplogo.png')}
+                style={styles.logoImage}
+              />
+              <Text style={styles.logoText}>Crypto Pulse</Text>
             </View>
 
             {/* Form Section */}
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Sign in to your Account</Text>
-              <Text style={styles.subtitle}>Enter your email and password to log in</Text>
+              <Text style={styles.title}>Welcome back</Text>
+              <Text style={styles.subtitle}>Sign in to your account</Text>
 
               {/* Email Input */}
               <View style={styles.inputContainer}>
@@ -77,6 +128,7 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
+                  editable={!loading}
                 />
               </View>
 
@@ -91,10 +143,12 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
                     placeholder="Enter your password"
                     secureTextEntry={!showPassword}
                     autoCapitalize="none"
+                    editable={!loading}
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     style={styles.eyeIcon}
+                    disabled={loading}
                   >
                     <Ionicons
                       name={showPassword ? 'eye' : 'eye-off'}
@@ -105,33 +159,24 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
                 </View>
               </View>
 
-              {/* Forgot Password */}
-              <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>Forgot Password ?</Text>
-              </TouchableOpacity>
-
               {/* Sign In Button */}
-              <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
-                <Text style={styles.signInButtonText}>Log In</Text>
-              </TouchableOpacity>
-
-              {/* Divider */}
-              <View style={styles.dividerContainer}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>Or</Text>
-                <View style={styles.dividerLine} />
-              </View>
-
-              {/* Google Sign In */}
-              <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-                <Text style={styles.googleButtonText}>🔍 Continue with Google</Text>
+              <TouchableOpacity 
+                style={[styles.signInButton, loading && styles.disabledButton]} 
+                onPress={handleSignIn}
+                disabled={loading}
+              >
+                <Text style={styles.signInButtonText}>
+                  {loading ? 'Signing In...' : 'Sign In'}
+                </Text>
               </TouchableOpacity>
 
               {/* Sign Up Link */}
               <View style={styles.signUpContainer}>
                 <Text style={styles.signUpText}>Don't have an account? </Text>
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                  <Text style={styles.signUpLink}>Sign Up</Text>
+                <TouchableOpacity onPress={handleSignUp} disabled={loading}>
+                  <Text style={[styles.signUpLink, loading && styles.disabledText]}>
+                    Sign Up
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

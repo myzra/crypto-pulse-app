@@ -13,23 +13,97 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { authService } from '../services/api';
 
 const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    if (!fullName || !email || !birthDate || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
+  const validateForm = () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Email and password are required');
+      return false;
     }
-    
-    // Add your sign-up logic here
-    Alert.alert('Success', 'Account created successfully!', [
-      { text: 'OK', onPress: () => navigation.navigate('SignIn') }
-    ]);
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return false;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleRegister = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      const userData = {
+        email: email,
+        password: password,
+      };
+
+      // Add username if provided
+      if (username.trim()) {
+        userData.username = username;
+      }
+
+      const result = await authService.signUp(userData);
+
+      Alert.alert(
+        'Success', 
+        result.message || 'Account created successfully!',
+        [
+          { 
+            text: 'OK', 
+            onPress: () => navigation.navigate('SignIn') 
+          }
+        ]
+      );
+
+      // Clear form
+      setEmail('');
+      setUsername('');
+      setPassword('');
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      // Handle different types of errors
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error?.message) {
+        if (error.message.includes('already exists')) {
+          errorMessage = 'An account with this email already exists';
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      } else if (error?.detail) {
+        errorMessage = error.detail;
+      } else {
+        // Fallback for any other error format
+        errorMessage = JSON.stringify(error) || 'An unexpected error occurred';
+      }
+
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = () => {
@@ -39,6 +113,7 @@ const SignUpScreen = ({ navigation }) => {
   const handleBackPress = () => {
     navigation.goBack();
   };
+
 
   return (
     <SafeAreaView style={styles.container}>
