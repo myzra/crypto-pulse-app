@@ -1,7 +1,6 @@
-from pydantic import BaseModel, ConfigDict
-from pydantic import EmailStr
-from typing import Optional, List, Any, Dict
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict, EmailStr
+from typing import Optional, List, Any, Dict, Literal
+from datetime import datetime, time
 from decimal import Decimal
 import uuid
 
@@ -110,21 +109,14 @@ class LogResponse(LogBase):
     notified_at: Optional[datetime] = None
 
 # Notification schemas
-class NotificationBase(BaseSchema):
-    user_id: uuid.UUID
-    coin_id: int
-    interval_hours: int
-
-class NotificationCreate(NotificationBase):
-    pass
-
-class NotificationUpdate(BaseSchema):
-    coin_id: Optional[int] = None
+class NotificationCreate(BaseModel):
+    user_id: str
+    coin_id: str
+    frequency_type: Literal["hourly", "daily", "weekly", "custom"]
     interval_hours: Optional[int] = None
-
-class NotificationResponse(NotificationBase):
-    last_sent_at: Optional[datetime] = None
-
+    preferred_time: Optional[time] = None
+    preferred_day: Optional[int] = None
+    
 # Extended response schemas with relationships
 class CoinWithPrice(CoinResponse):
     price: Optional[CoinPriceResponse] = None
@@ -137,9 +129,6 @@ class FavoriteWithCoin(FavoriteResponse):
 
 class LogWithCoin(LogResponse):
     coin: Optional[CoinResponse] = None
-
-class NotificationWithCoin(NotificationResponse):
-    coin: CoinResponse
 
 # Dashboard/summary schemas
 class CoinSummary(BaseSchema):
@@ -157,4 +146,3 @@ class UserDashboard(BaseSchema):
     user: UserResponse
     favorite_coins: List[CoinSummary] = []
     recent_logs: List[LogWithCoin] = []
-    active_notifications: List[NotificationWithCoin] = []
