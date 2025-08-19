@@ -4,9 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
-# Import your updated auth router
-from app.routers import auth, users  # Make sure to update the auth.py file
+from app.routers import auth, users, coins, favorites, notifications
 from app.database import init_db
+from app.services import price_service
+
+from app.scheduler.price_scheduler import start_background_tasks, stop_background_tasks
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,7 +36,27 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
+app.include_router(price_service.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(coins.router, prefix="/api/coins", tags=["Coins"])
+app.include_router(favorites.router, prefix="/api/favorites", tags=["Favorites"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
 
+
+@app.on_event("startup")
+async def startup_event():
+    """Start background tasks when the app starts"""
+    print("Starting Crypto Pulse API...")
+    start_background_tasks()
+    print("Price scheduler started")
+
+# Shutdown event - stop the price scheduler
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up background tasks when the app shuts down"""
+    print("Shutting down Crypto Pulse API...")
+    stop_background_tasks()
+    print("Price scheduler stopped")
+    
 @app.get("/")
 async def root():
     return {"message": "Crypto Pulse API", "status": "running"}
