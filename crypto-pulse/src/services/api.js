@@ -138,7 +138,7 @@ export const coinsService = {
 // Favorites service (for future use)
 export const favoritesService = {
   async getUserFavorites(userId) {
-    return ApiService.get(`/api/users/${userId}/favorites`);
+    return ApiService.get(`/api/favorites/users/${userId}/favorites`);
   },
 
   async addFavorite(userId, coinId) {
@@ -148,8 +148,50 @@ export const favoritesService = {
     });
   },
 
-  async removeFavorite(favoriteId) {
-    return ApiService.delete(`/api/favorites/${favoriteId}`);
+  async removeFavorite(userId, coinId) {
+    return ApiService.delete(`/api/favorites/${userId}/${coinId}`);
+  },
+};
+
+// Notifications service
+export const notificationsService = {
+  /**
+   * Create a new notification
+   * @param {Object} notificationData - Notification data
+   * @param {string} notificationData.user_id - User ID
+   * @param {number} notificationData.coin_id - Coin ID
+   * @param {string} notificationData.frequency_type - Frequency type (hourly, daily, weekly, custom)
+   * @param {number} [notificationData.interval_hours] - Custom interval in hours
+   * @param {string} [notificationData.preferred_time] - Preferred time in HH:MM format
+   * @param {string} [notificationData.preferred_day] - Preferred day name
+   */
+  async createNotification(notificationData) {
+    return ApiService.post('/api/notifications', notificationData);
+  },
+
+  /**
+   * Get all notifications for a user
+   * @param {string} userId - User ID
+   */
+  async getUserNotifications(userId) {
+    return ApiService.get(`/api/notifications/${userId}`);
+  },
+
+  /**
+   * Delete a notification
+   * @param {string} notificationId - Notification ID
+   */
+  async deleteNotification(notificationId) {
+    return ApiService.delete(`/api/notifications/${notificationId}`);
+  },
+
+  /**
+   * Update a notification
+   * @param {string} notificationId - Notification ID
+   * @param {Object} updateData - Data to update
+   */
+  async updateNotification(notificationId, updateData) {
+    return ApiService.put(`/api/notifications/${notificationId}`, updateData);
   },
 };
 

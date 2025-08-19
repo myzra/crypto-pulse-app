@@ -111,12 +111,24 @@ class Log(Base):
 class Notification(Base):
     __tablename__ = "notifications"
     __table_args__ = {"schema": "public"}
-    
-    user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id", ondelete="CASCADE"), primary_key=True)
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id", ondelete="CASCADE"), nullable=False)
     coin_id = Column(BigInteger, ForeignKey("public.coins.id", ondelete="CASCADE"), nullable=False)
-    interval_hours = Column(BigInteger, nullable=False)
-    last_sent_at = Column(DateTime(timezone=True), nullable=True, default=func.now())
-    
-    # Relationships - using string references to avoid circular imports
+    frequency_type = Column(
+        String(20), 
+        nullable=False
+    )
+    interval_hours = Column(Integer, nullable=True)
+    preferred_time = Column(DateTime(timezone=False), nullable=True)
+    preferred_day = Column(Integer, nullable=True)
+
+    is_active = Column(Boolean, default=True)
+    last_sent_at = Column(DateTime(timezone=True), nullable=True)
+    next_scheduled_at = Column(DateTime(timezone=True), nullable=True)
+
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
     user = relationship("User", back_populates="notifications")
     coin = relationship("Coin", back_populates="notifications")
