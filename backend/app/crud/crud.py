@@ -8,7 +8,7 @@ from app.models.models import User, Coin, CoinPrice, Favorite, Log, Notification
 from app.schemas.schemas import (
     UserCreate, UserUpdate, CoinCreate, CoinUpdate, 
     CoinPriceCreate, CoinPriceUpdate, FavoriteCreate, 
-    LogCreate, LogUpdate, NotificationCreate, NotificationUpdate
+    LogCreate, LogUpdate, NotificationCreate
 )
 
 # User CRUD operations
