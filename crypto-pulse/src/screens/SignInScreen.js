@@ -14,12 +14,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { authService } from '../services/api';
+import { useUser } from '../context/UserContext'; // Add this import
 
-const SignInScreen = ({ navigation, setIsAuthenticated }) => {
+const SignInScreen = ({ navigation }) => { // Remove setIsAuthenticated prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { login } = useUser(); // Use the user context
 
   const validateForm = () => {
     if (!email || !password) {
@@ -49,10 +51,13 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
       };
 
       const result = await authService.signIn(credentials);
+      console.log('Response status: 200');
+      console.log('Response data:', result);
 
-      // Store user data in your app's state/context/AsyncStorage
-      // For now, we'll just set authentication to true
-      setIsAuthenticated(true);
+      // Use the context login function instead of setIsAuthenticated
+      if (result.user) {
+        login(result.user); // Pass the user data to context
+      }
 
       Alert.alert(
         'Welcome!', 
@@ -61,7 +66,7 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
           { 
             text: 'OK', 
             onPress: () => {
-              // Navigation will be handled by AppNavigator based on isAuthenticated state
+              // Navigation will be handled automatically by AppNavigator
             }
           }
         ]
