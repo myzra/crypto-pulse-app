@@ -36,6 +36,14 @@ const NotificationModal = ({ visible, coin, onClose, onConfirm }) => {
     '18:00', '19:00', '20:00', '21:00', '22:00'
   ];
 
+  const formatTime = (timeString) => {
+    if (timeString && timeString.includes(':')) {
+      const parts = timeString.split(':');
+      return `${parts[0]}:${parts[1]}`;
+    }
+    return timeString;
+  };
+
   const handleFrequencySelect = (frequency) => {
     setSelectedFrequency(frequency);
     // Reset values when switching frequency
@@ -52,53 +60,114 @@ const NotificationModal = ({ visible, coin, onClose, onConfirm }) => {
     setSelectedDay(day);
   };
 
-  const handleConfirm = async () => {
-    // Validation
-    if (!user) {
-      Alert.alert('Error', 'User not found. Please login again.');
-      return;
-    }
-
-    if (selectedFrequency === 'Custom' && (!customHours || parseInt(customHours) <= 0)) {
-      Alert.alert('Invalid Input', 'Please enter valid hours for custom frequency');
-      return;
-    }
-
-    if (selectedFrequency === 'Custom' && parseInt(customHours) > 168) { // 168 hours = 1 week
-      Alert.alert('Invalid Input', 'Custom hours cannot exceed 168 (1 week)');
-      return;
-    }
-
-    setIsLoading(true);
-
-    const notificationData = {
-      user_id: user.id,
-      coin_id: coin.id,
-      frequency_type: selectedFrequency.toLowerCase(),
-      interval_hours: selectedFrequency === 'Custom' ? parseInt(customHours) : null,
-      preferred_time: selectedFrequency === 'Daily' || selectedFrequency === 'Weekly' ? preferredTime : null,
-      preferred_day: selectedFrequency === 'Weekly' ? selectedDay : null
-    };
-
-    try {
-      // Use the notifications service instead of direct fetch
-      const result = await notificationsService.createNotification(notificationData);
-      
-      // Call the onConfirm callback with the result
-      if (onConfirm) {
-        await onConfirm(result);
-      }
   
-      // Reset form and close modal
-      handleCancel();
-      
-    } catch (error) {
-      console.error("Error creating notification:", error);
-      Alert.alert('Error', error.message || 'Failed to create notification. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+const handleConfirm = async () => {
+  // Prevent multiple submissions
+  if (isLoading) {
+    return;
+  }
+
+  // Validation
+  if (!user) {
+    Alert.alert('Error', 'User not found. Please login again.');
+    return;
+  }
+
+  if (selectedFrequency === 'Custom' && (!customHours || parseInt(customHours) <= 0)) {
+    Alert.alert('Invalid Input', 'Please enter valid hours for custom frequency');
+    return;
+  }
+
+  if (selectedFrequency === 'Custom' && parseInt(customHours) > 168) { // 168 hours = 1 week
+    Alert.alert('Invalid Input', 'Custom hours cannot exceed 168 (1 week)');
+    return;
+  }
+
+  setIsLoading(true);
+
+  const notificationData = {
+    user_id: user.id,
+    coin_id: coin.id,
+    frequency_type: selectedFrequency.toLowerCase(),
+    interval_hours: selectedFrequency === 'Custom' ? parseInt(customHours) : null,
+    preferred_time: selectedFrequency === 'Daily' || selectedFrequency === 'Weekly' ? formatTime(preferredTime) : null,
+    preferred_day: selectedFrequency === 'Weekly' ? selectedDay : null
   };
+
+  try {
+    // Check if notification already exists first
+    const existingNotification = await notificationsService.checkNotification(user.id, coin.id);
+    
+    if (existingNotification.hasNotification) {
+      Alert.alert(
+        'Notification Exists', 
+        'You already have an active notification for this coin. Would you like to update it instead?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Update', 
+            onPress: async () => {
+              try {
+                const result = await notificationsService.updateNotificationByUserCoin(
+                  user.id, 
+                  coin.id, 
+                  {
+                    frequency_type: notificationData.frequency_type,
+                    interval_hours: notificationData.interval_hours,
+                    preferred_time: notificationData.preferred_time,
+                    preferred_day: notificationData.preferred_day
+                  }
+                );
+                
+                if (onConfirm) {
+                  await onConfirm(result);
+                }
+                
+                handleCancel();
+              } catch (updateError) {
+                console.error("Error updating notification:", updateError);
+                Alert.alert('Error', 'Failed to update notification. Please try again.');
+              }
+            }
+          }
+        ]
+      );
+      return;
+    }
+
+    // Create new notification
+    const result = await notificationsService.createNotification(notificationData);
+    
+    // Call the onConfirm callback with the result
+    if (onConfirm) {
+      await onConfirm(result);
+    }
+
+    // Show success message
+    Alert.alert('Success', 'Notification created successfully!');
+    
+    // Reset form and close modal
+    handleCancel();
+    
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    
+    // More specific error handling
+    if (error.message.includes('already exists')) {
+      Alert.alert(
+        'Notification Exists', 
+        'You already have an active notification for this coin.',
+        [
+          { text: 'OK', onPress: handleCancel }
+        ]
+      );
+    } else {
+      Alert.alert('Error', error.message || 'Failed to create notification. Please try again.');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleCancel = () => {
     setSelectedFrequency('Hourly');

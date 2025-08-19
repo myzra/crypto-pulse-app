@@ -1,14 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'react-native';
-import NotificationModal from './NotificationModal'; // Import the modal
+import NotificationModal from './NotificationModal';
+import { useUser } from '../context/UserContext';
+import { notificationsService } from '../services/api';
 
-const CoinItem = ({ coin, onToggleFavorite, isUserLoggedIn }) => {
+const CoinItem = ({ coin, onToggleFavorite }) => {
+  const { user, isLoggedIn } = useUser(); // Get user from context
   const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false);
+  const [hasNotification, setHasNotification] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Check for existing notification when component mounts or user changes
+  useEffect(() => {
+    if (isLoggedIn && coin?.id) {
+      checkExistingNotification();
+    } else {
+      setHasNotification(false);
+    }
+  }, [isLoggedIn, coin?.id, user?.id]);
+
+  // Function to check if user has existing notification for this coin
+  const checkExistingNotification = async () => {
+    if (!user?.id || !coin?.id) return;
+
+    try {
+      setLoading(true);
+      const data = await notificationsService.checkNotification(user.id, coin.id);
+      setHasNotification(data.hasNotification);
+    } catch (error) {
+      console.error('Error checking notification:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle favorite button press
   const handleFavoritePress = async () => {
-    if (!isUserLoggedIn) {
+    if (!isLoggedIn) {
       Alert.alert('Login Required', 'Please login to manage favorites');
       return;
     }
@@ -28,24 +57,84 @@ const CoinItem = ({ coin, onToggleFavorite, isUserLoggedIn }) => {
 
   // Handle notification button press
   const handleNotificationPress = () => {
-    if (!isUserLoggedIn) {
+    if (!isLoggedIn) {
       Alert.alert('Login Required', 'Please login to set notifications');
       return;
     }
-    setIsNotificationModalVisible(true);
+
+    if (hasNotification) {
+      // Show options to modify or delete existing notification
+      Alert.alert(
+        'Notification Settings',
+        'You already have notifications set for this coin.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Modify', onPress: () => setIsNotificationModalVisible(true) },
+          { text: 'Remove', onPress: handleRemoveNotification, style: 'destructive' },
+        ]
+      );
+    } else {
+      setIsNotificationModalVisible(true);
+    }
+  };
+
+  // Handle removing notification
+  const handleRemoveNotification = async () => {
+    try {
+      setLoading(true);
+      await notificationsService.deleteNotificationByUserCoin(user.id, coin.id);
+      setHasNotification(false);
+      Alert.alert('Success', 'Notification removed successfully');
+    } catch (error) {
+      console.error('Error removing notification:', error);
+      Alert.alert('Error', 'Failed to remove notification. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Handle notification confirmation
-  const handleNotificationConfirm = async (notificationData) => {
+  const handleNotificationConfirm = async (result, action) => {
     try {
-      console.log('Notification data:', notificationData);
-      // Here you'll later add your API call to save notification settings
-      // await saveNotificationSettings(notificationData);
+      setLoading(true);
+      console.log('Notification confirmed:', result, action);
       
-      Alert.alert('Success', 'Notification settings saved successfully');
+      // The API call has already been made in the modal!
+      // We just need to update the UI state here
+      
+      if (action === 'created') {
+        console.log('New notification created with ID:', result.id);
+        setHasNotification(true);
+        // Optional: You can store the notification data for display
+        // setNotificationData(result);
+        
+        // No need to show alert here since the modal already shows success
+        // Alert.alert('Success', 'Notification settings saved successfully');
+        
+      } else if (action === 'updated') {
+        console.log('Notification updated with ID:', result.id);
+        setHasNotification(true);
+        // Optional: Update stored notification data
+        // setNotificationData(result);
+        
+        // No need to show alert here since the modal already shows success
+        // Alert.alert('Success', 'Notification settings updated successfully');
+        
+      } else {
+        // Fallback for old behavior - this shouldn't happen with the new modal
+        console.warn('Unknown action type:', action);
+        setHasNotification(true);
+      }
+      
+      // Optional: Refresh any notification lists or UI elements
+      // await refreshNotificationsList();
+      
     } catch (error) {
-      console.error('Error saving notification:', error);
-      Alert.alert('Error', 'Failed to save notification settings. Please try again.');
+      // This should rarely happen now since API calls are in the modal
+      console.error('Error in handleNotificationConfirm:', error);
+      Alert.alert('Error', 'Failed to update notification status. Please refresh.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,15 +188,20 @@ const CoinItem = ({ coin, onToggleFavorite, isUserLoggedIn }) => {
             <TouchableOpacity 
               style={[
                 styles.notificationButton,
-                coin.isPositive ? styles.addButton : styles.checkButton
+                hasNotification ? styles.checkButton : styles.addButton
               ]}
-              onPress={handleNotificationPress} // Add this line
+              onPress={handleNotificationPress}
+              disabled={loading}
             >
               <Image
-                source={coin.isPositive
-                  ? require('../../assets/buttons/NotChecked.png')
-                  : require('../../assets/buttons/Checkmark.png')}
-                style={{ width: 20, height: 20 }}
+                source={hasNotification
+                  ? require('../../assets/buttons/Checkmark.png')
+                  : require('../../assets/buttons/NotChecked.png')}
+                style={{ 
+                  width: 20, 
+                  height: 20,
+                  opacity: loading ? 0.5 : 1
+                }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
@@ -121,6 +215,7 @@ const CoinItem = ({ coin, onToggleFavorite, isUserLoggedIn }) => {
         coin={coin}
         onClose={() => setIsNotificationModalVisible(false)}
         onConfirm={handleNotificationConfirm}
+        existingNotification={hasNotification}
       />
     </>
   );

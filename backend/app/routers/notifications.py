@@ -34,24 +34,44 @@ class NotificationCreate(BaseModel):
             if v > 168:  # 1 week in hours
                 raise ValueError('interval_hours cannot exceed 168 hours (1 week)')
         return v
-    
+
     @validator('preferred_time')
     def validate_preferred_time(cls, v, values):
         if v is not None:
             try:
-                # Validate time format HH:MM
-                time_obj = datetime.strptime(v, '%H:%M').time()
-                return v
+                # Handle both HH:MM and HH:MM:SS formats
+                if len(v.split(':')) == 3:  # HH:MM:SS format
+                    time_obj = datetime.strptime(v, '%H:%M:%S').time()
+                    # Return in HH:MM format
+                    return f"{time_obj.hour:02d}:{time_obj.minute:02d}"
+                elif len(v.split(':')) == 2:  # HH:MM format
+                    time_obj = datetime.strptime(v, '%H:%M').time()
+                    return v
+                else:
+                    raise ValueError('Invalid time format')
             except ValueError:
-                raise ValueError('preferred_time must be in HH:MM format')
+                raise ValueError('preferred_time must be in HH:MM or HH:MM:SS format')
         return v
-    
+
     @validator('preferred_day')
     def validate_preferred_day(cls, v):
         if v is not None:
-            allowed_days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-            if v.lower() not in allowed_days:
-                raise ValueError(f'preferred_day must be one of: {", ".join(allowed_days)}')
+            # Handle both string and integer inputs
+            if isinstance(v, int):
+                # Convert number to day name (assuming 0=Monday, 6=Sunday)
+                day_names = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+                if 0 <= v <= 6:
+                    v = day_names[v]
+                else:
+                    raise ValueError('preferred_day number must be between 0-6 (Monday-Sunday)')
+            
+            if isinstance(v, str):
+                allowed_days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+                if v.lower() not in allowed_days:
+                    raise ValueError(f'preferred_day must be one of: {", ".join(allowed_days)}')
+                return v.lower()
+            else:
+                raise ValueError('preferred_day must be a string day name or number 0-6')
         return v
 
 class NotificationResponse(BaseModel):
@@ -156,7 +176,7 @@ def create_notification(
             detail="Coin not found"
         )
     
-    # Check if user already has a notification for this coin
+    # Check if user already has a notification for this coin FIRST
     existing_notification = db.query(Notification).filter(
         Notification.user_id == notification_data.user_id,
         Notification.coin_id == notification_data.coin_id,
@@ -172,7 +192,6 @@ def create_notification(
     # Convert preferred_time string to datetime object if provided
     preferred_time_obj = None
     if notification_data.preferred_time:
-        # Convert "HH:MM" to a datetime object (using epoch date)
         time_obj = datetime.strptime(notification_data.preferred_time, '%H:%M').time()
         preferred_time_obj = datetime.combine(datetime(1970, 1, 1).date(), time_obj)
     
@@ -189,7 +208,7 @@ def create_notification(
         notification_data.preferred_day
     )
     
-    # Create notification
+    # Create notification AFTER all validation passes
     db_notification = Notification(
         user_id=notification_data.user_id,
         coin_id=notification_data.coin_id,
@@ -253,3 +272,157 @@ def delete_notification(
     db.commit()
     
     return None
+
+class NotificationCheckRequest(BaseModel):
+    user_id: uuid.UUID
+    coin_id: int
+
+class NotificationCheckResponse(BaseModel):
+    hasNotification: bool
+    notification: Optional[NotificationResponse] = None
+
+class NotificationUpdateRequest(BaseModel):
+    frequency_type: str
+    interval_hours: Optional[int] = None
+    preferred_time: Optional[str] = None  # Time as string "HH:MM"
+    preferred_day: Optional[str] = None   # Day name as string
+    
+    @validator('frequency_type')
+    def validate_frequency_type(cls, v):
+        allowed_frequencies = ['hourly', 'daily', 'weekly', 'custom']
+        if v.lower() not in allowed_frequencies:
+            raise ValueError(f'frequency_type must be one of: {", ".join(allowed_frequencies)}')
+        return v.lower()
+
+@router.post("/check", response_model=NotificationCheckResponse)
+def check_notification(
+    request: NotificationCheckRequest,
+    db: Session = Depends(get_db)
+):
+    """Check if user has an active notification for the specified coin"""
+    
+    # Verify user exists
+    user = db.query(User).filter(User.id == request.user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Query for existing notification
+    notification = db.query(Notification).filter(
+        Notification.user_id == request.user_id,
+        Notification.coin_id == request.coin_id,
+        Notification.is_active == True
+    ).first()
+    
+    if notification:
+        return NotificationCheckResponse(
+            hasNotification=True,
+            notification=notification
+        )
+    else:
+        return NotificationCheckResponse(hasNotification=False)
+
+@router.delete("/user/{user_id}/coin/{coin_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_notification_by_user_coin(
+    user_id: uuid.UUID,
+    coin_id: int,
+    db: Session = Depends(get_db)
+):
+    """Delete (deactivate) a notification by user_id and coin_id"""
+    
+    # Verify user exists
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Find the notification
+    notification = db.query(Notification).filter(
+        Notification.user_id == user_id,
+        Notification.coin_id == coin_id,
+        Notification.is_active == True
+    ).first()
+    
+    if not notification:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Active notification not found for this user and coin"
+        )
+    
+    # Soft delete by setting is_active to False
+    notification.is_active = False
+    db.commit()
+    
+    return None
+
+@router.put("/user/{user_id}/coin/{coin_id}", response_model=NotificationResponse)
+def update_notification_by_user_coin(
+    user_id: uuid.UUID,
+    coin_id: int,
+    notification_data: NotificationUpdateRequest,
+    db: Session = Depends(get_db)
+):
+    """Update an existing notification by user_id and coin_id"""
+    
+    # Verify user exists
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Find the notification
+    notification = db.query(Notification).filter(
+        Notification.user_id == user_id,
+        Notification.coin_id == coin_id,
+        Notification.is_active == True
+    ).first()
+    
+    if not notification:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Active notification not found for this user and coin"
+        )
+    
+    # Convert preferred_time string to datetime object if provided
+    preferred_time_obj = None
+    if notification_data.preferred_time:
+        time_obj = datetime.strptime(notification_data.preferred_time, '%H:%M').time()
+        preferred_time_obj = datetime.combine(datetime(1970, 1, 1).date(), time_obj)
+    
+    # Convert preferred_day string to number if provided
+    preferred_day_num = None
+    if notification_data.preferred_day:
+        preferred_day_num = convert_day_name_to_number(notification_data.preferred_day)
+    
+    # Calculate next scheduled time
+    next_scheduled_at = calculate_next_scheduled_time(
+        notification_data.frequency_type,
+        notification_data.interval_hours,
+        notification_data.preferred_time,
+        notification_data.preferred_day
+    )
+    
+    # Update notification fields
+    notification.frequency_type = notification_data.frequency_type
+    notification.interval_hours = notification_data.interval_hours
+    notification.preferred_time = preferred_time_obj
+    notification.preferred_day = preferred_day_num
+    notification.next_scheduled_at = next_scheduled_at
+    
+    try:
+        db.commit()
+        db.refresh(notification)
+        return notification
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating the notification"
+        )

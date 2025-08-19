@@ -193,6 +193,37 @@ export const notificationsService = {
   async updateNotification(notificationId, updateData) {
     return ApiService.put(`/api/notifications/${notificationId}`, updateData);
   },
+
+  /**
+* Check if user has an active notification for a specific coin
+* @param {string} userId - User ID
+* @param {number} coinId - Coin ID
+*/
+async checkNotification(userId, coinId) {
+  return ApiService.post('/api/notifications/check', {
+    user_id: userId,
+    coin_id: coinId,
+  });
+ },
+ 
+ /**
+ * Delete notification by user and coin ID
+ * @param {string} userId - User ID
+ * @param {number} coinId - Coin ID
+ */
+ async deleteNotificationByUserCoin(userId, coinId) {
+  return ApiService.delete(`/api/notifications/user/${userId}/coin/${coinId}`);
+ },
+ 
+ /**
+ * Update notification by user and coin ID
+ * @param {string} userId - User ID
+ * @param {number} coinId - Coin ID
+ * @param {Object} updateData - Notification update data
+ */
+ async updateNotificationByUserCoin(userId, coinId, updateData) {
+  return ApiService.put(`/api/notifications/user/${userId}/coin/${coinId}`, updateData);
+ },
 };
 
 export default ApiService;
