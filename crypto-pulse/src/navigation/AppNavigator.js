@@ -1,12 +1,13 @@
-import SignUpScreen from '../screens/SignUpScreen';import React, { useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SignInScreen from '../screens/SignInScreen';
-
+import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 import FavScreen from '../screens/FavScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import { useUser } from '../context/UserContext'; // Import your user context
 
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -27,16 +28,14 @@ const MainTabNavigator = () => {
 };
 
 const AppNavigator = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isLoggedIn } = useUser(); // Use the user context instead of local state
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!isAuthenticated ? (
+        {!isLoggedIn ? (
           <>
-            <Stack.Screen name="SignIn">
-              {(props) => <SignInScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
-            </Stack.Screen>
+            <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
           </>
         ) : (
