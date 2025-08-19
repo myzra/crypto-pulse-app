@@ -19,11 +19,18 @@ class ApiService {
       const response = await fetch(url, config);
       
       let data;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        console.error('Failed to parse response as JSON:', parseError);
-        throw new Error(`Server returned invalid JSON. Status: ${response.status}`);
+      
+      // Check if response has content to parse
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        // No content to parse for 204 No Content or empty responses
+        data = null;
+      } else {
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse response as JSON:', parseError);
+          throw new Error(`Server returned invalid JSON. Status: ${response.status}`);
+        }
       }
 
       console.log('Response status:', response.status);

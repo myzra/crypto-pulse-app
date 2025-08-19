@@ -354,7 +354,10 @@ def delete_notification_by_user_coin(
         )
     
     # Soft delete by setting is_active to False
-    notification.is_active = False
+    # notification.is_active = False
+    
+    # Hard delete 
+    db.delete(notification)
     db.commit()
     
     return None
