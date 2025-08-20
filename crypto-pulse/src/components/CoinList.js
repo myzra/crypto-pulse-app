@@ -13,6 +13,8 @@ const CoinList = ({
   // Auto-refresh settings
   autoRefresh = true,
   refreshInterval = 5 * 60 * 1000, // 5 minutes
+  // Refresh function for external data
+  onRefresh: externalRefresh,
 }) => {
   // Use the coins hook for automatic price updates
   const {
@@ -22,12 +24,40 @@ const CoinList = ({
     lastUpdated,
     refreshCoins,
     updateCoin,
-  } = useCoins(autoRefresh, refreshInterval);
+  } = useCoins(autoRefresh, refreshInterval); // Always enable auto-refresh for price updates
 
   // Use external data if provided, otherwise use hook data
+  // If external data is provided, merge it with hook data for updated prices
   const data = useMemo(() => {
+    if (externalData && hookCoins.length > 0) {
+      // Merge external data with hook data to get updated prices
+      return externalData.map(externalCoin => {
+        const hookCoin = hookCoins.find(h => h.id === externalCoin.id);
+        if (hookCoin) {
+          // Use external data for favorites status, hook data for prices
+          return {
+            ...externalCoin,
+            price: hookCoin.price,
+            change: hookCoin.change,
+            isPositive: hookCoin.isPositive,
+            rawPrice: hookCoin.rawPrice,
+            rawChange: hookCoin.rawChange,
+            lastUpdated: hookCoin.lastUpdated,
+          };
+        }
+        return externalCoin;
+      });
+    }
     return externalData || hookCoins;
   }, [externalData, hookCoins]);
+
+  // Determine loading state - show loading only when no data is available
+  const isLoading = useMemo(() => {
+    if (data.length > 0) {
+      return false; // We have data to show, don't show loading
+    }
+    return loading;
+  }, [data.length, loading]);
 
   // Memoize the data to prevent unnecessary re-renders
   const memoizedData = useMemo(() => data, [data]);
@@ -35,19 +65,24 @@ const CoinList = ({
   // Handle favorite toggle with local state update
   const handleToggleFavorite = useCallback(async (coin) => {
     try {
-      // Optimistically update UI
-      updateCoin(coin.id, { isFavorite: !coin.isFavorite });
-      
-      // Call the provided handler
+      // Call the provided handler first
       if (onToggleFavorite) {
         await onToggleFavorite(coin);
       }
+      
+      // Only update local state if using hook data (not external data)
+      if (!externalData) {
+        updateCoin(coin.id, { isFavorite: !coin.isFavorite });
+      }
     } catch (error) {
-      // Revert optimistic update on error
-      updateCoin(coin.id, { isFavorite: coin.isFavorite });
+      // Revert optimistic update on error (only for hook data)
+      if (!externalData) {
+        updateCoin(coin.id, { isFavorite: coin.isFavorite });
+      }
       console.error('Error toggling favorite:', error);
+      throw error; // Re-throw so parent can handle the error
     }
-  }, [onToggleFavorite, updateCoin]);
+  }, [onToggleFavorite, updateCoin, externalData]);
 
   // Memoized render function for better performance
   const renderCoinItem = useCallback(({ item }) => (
@@ -70,8 +105,14 @@ const CoinList = ({
 
   // Handle pull-to-refresh
   const onRefresh = useCallback(() => {
+    // Always refresh hook data for price updates
     refreshCoins();
-  }, [refreshCoins]);
+    
+    // Also call external refresh if provided
+    if (externalRefresh) {
+      externalRefresh();
+    }
+  }, [refreshCoins, externalRefresh]);
 
   // Log updates for debugging
   useEffect(() => {
@@ -81,7 +122,7 @@ const CoinList = ({
   }, [lastUpdated]);
 
   // Show error state
-  if (error) {
+  if (error && !externalData) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
@@ -115,7 +156,7 @@ const CoinList = ({
         contentContainerStyle={styles.contentContainer}
         refreshControl={
           <RefreshControl
-            refreshing={loading}
+            refreshing={isLoading}
             onRefresh={onRefresh}
             colors={['#8663EC']} // Android
             tintColor="#8663EC" // iOS
@@ -124,7 +165,7 @@ const CoinList = ({
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
-              {loading ? 'Loading coins...' : 'No coins available'}
+              {isLoading ? 'Loading coins...' : 'No coins available'}
             </Text>
           </View>
         }

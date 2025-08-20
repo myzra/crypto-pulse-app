@@ -18,7 +18,7 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import CoinList from '../components/CoinList';
-import { favoritesService } from '@/services/api';
+import { favoritesService } from '../services/api';
 import { getCoinImage } from '../constants/cryptoData';
 import { useUser } from '../context/UserContext';
 
@@ -37,7 +37,10 @@ const FavScreen = () => {
 
   // Fetch user's favorite coins
   const fetchFavorites = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
@@ -84,17 +87,28 @@ const FavScreen = () => {
     if (!user?.id) return;
 
     try {
-      // Always remove since this is the favorites screen
-      await favoritesService.removeFavorite(user.id, coin.id);
-            
-      // Remove from local state
+      // Optimistically remove from UI first
       setFavoriteCoins(prevCoins => 
         prevCoins.filter(c => c.id !== coin.id)
       );
+
+      // Always remove since this is the favorites screen
+      await favoritesService.removeFavorite(user.id, coin.id);
         
+      // Show success message
       Alert.alert('Success', `${coin.name} removed from favorites`);
     } catch (error) {
       console.error('Error removing favorite:', error);
+      
+      // Revert optimistic update on error
+      setFavoriteCoins(prevCoins => {
+        // Check if coin is already back in the list
+        if (!prevCoins.find(c => c.id === coin.id)) {
+          return [...prevCoins, coin].sort((a, b) => a.name.localeCompare(b.name));
+        }
+        return prevCoins;
+      });
+      
       Alert.alert('Error', 'Failed to remove from favorites');
       throw error;
     }
@@ -171,7 +185,7 @@ const FavScreen = () => {
         <View style={styles.centerContainer}>
           <Text style={styles.emptyTitle}>No Favorites Yet</Text>
           <Text style={styles.emptyText}>
-            Start adding cryptocurrencies to your favorites by tapping the star icon
+            Start adding cryptocurrencies to your favorites by tapping the star icon on the home screen
           </Text>
         </View>
         <BottomNav active="star" />
@@ -190,15 +204,17 @@ const FavScreen = () => {
       <SearchBar
         value={searchText}
         onChangeText={setSearchText}
-        placeholder="Search cryptocurrencies..."
+        placeholder="Search favorite cryptocurrencies..."
         />
 
       {/* Favorite Coins List */}
       <CoinList 
-        data={filteredFavorites} 
+        externalData={filteredFavorites} 
         title={`Favorite Coins (${filteredFavorites.length})`}
         onToggleFavorite={handleToggleFavorite}
         isUserLoggedIn={isLoggedIn}
+        onRefresh={fetchFavorites}
+        autoRefresh={true} // Enable auto-refresh for price updates
       />
       
       {/* Bottom Navigation */}

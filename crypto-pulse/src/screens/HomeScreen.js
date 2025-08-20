@@ -60,7 +60,7 @@ const HomeScreen = () => {
         id: coin.id,
         name: coin.name,
         symbol: coin.symbol,
-        price: coin.price?.current_price ? `${coin.price.current_price.toLocaleString()}` : 'N/A',
+        price: coin.price?.current_price ? `$${coin.price.current_price.toLocaleString()}` : 'N/A',
         change: coin.price?.change_24h ? `${coin.price.change_24h > 0 ? '+' : ''}${coin.price.change_24h.toFixed(2)}%` : '0.00%',
         isPositive: coin.price?.is_positive !== undefined ? coin.price.is_positive : true,
         color: coin.color || getDefaultColor(index),
@@ -93,13 +93,7 @@ const HomeScreen = () => {
     }
 
     try {
-      if (coin.isFavorite) {
-        await favoritesService.removeFavorite(user.id, coin.id);
-      } else {
-        await favoritesService.addFavorite(user.id, coin.id);
-      }
-
-      // Update local state
+      // Optimistically update UI first
       setCoins(prevCoins => 
         prevCoins.map(c => 
           c.id === coin.id 
@@ -107,9 +101,28 @@ const HomeScreen = () => {
             : c
         )
       );
+
+      // Then make API call
+      if (coin.isFavorite) {
+        await favoritesService.removeFavorite(user.id, coin.id);
+      } else {
+        await favoritesService.addFavorite(user.id, coin.id);
+      }
+
     } catch (error) {
       console.error('Error toggling favorite:', error);
+      
+      // Revert optimistic update on error
+      setCoins(prevCoins => 
+        prevCoins.map(c => 
+          c.id === coin.id 
+            ? { ...c, isFavorite: coin.isFavorite } // Revert to original state
+            : c
+        )
+      );
+      
       Alert.alert('Error', `Failed to ${coin.isFavorite ? 'remove from' : 'add to'} favorites`);
+      throw error; // Re-throw so CoinList can handle it
     }
   }, [isLoggedIn, user?.id]);
 
@@ -159,10 +172,12 @@ const HomeScreen = () => {
         </View>
       ) : (
         <CoinList 
-          data={filteredCoins} 
+          externalData={filteredCoins} 
           title={`Popular Coins (${filteredCoins.length})`}
           onToggleFavorite={handleToggleFavorite}
-          isUserLoggedIn={isLoggedIn} 
+          isUserLoggedIn={isLoggedIn}
+          onRefresh={fetchCoins}
+          autoRefresh={true} // Enable auto-refresh for price updates
         />
       )}
       
