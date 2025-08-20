@@ -129,16 +129,129 @@ export const authService = {
 
 // Coins service (for future use)
 export const coinsService = {
+  /**
+   * Get all coins with fresh prices (auto-updates stale prices)
+   * @returns {Promise} Promise that resolves to coins array
+   */
   async getAllCoins() {
-    return ApiService.get('/api/coins');
+    try {
+      const response = await ApiService.get('/api/coins');
+      console.log('Fetched coins with updated prices:', response?.length || 0);
+      return response;
+    } catch (error) {
+      console.error('Error fetching coins:', error);
+      throw error;
+    }
   },
 
+  /**
+   * Get specific coin with fresh price data
+   * @param {string|number} coinId - Coin ID
+   * @returns {Promise} Promise that resolves to coin object
+   */
   async getCoin(coinId) {
-    return ApiService.get(`/api/coins/${coinId}`);
+    try {
+      const response = await ApiService.get(`/api/coins/${coinId}`);
+      console.log('Fetched coin with updated price:', response?.symbol);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching coin ${coinId}:`, error);
+      throw error;
+    }
   },
 
+  /**
+   * Get coin prices (legacy endpoint)
+   * @param {string|number} coinId - Coin ID
+   * @returns {Promise} Promise that resolves to prices array
+   */
   async getCoinPrices(coinId) {
-    return ApiService.get(`/api/coins/${coinId}/prices`);
+    try {
+      const response = await ApiService.get(`/api/coins/${coinId}/prices`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching prices for coin ${coinId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Manually trigger price updates (for testing/admin)
+   * @returns {Promise} Promise that resolves to update result
+   */
+  async updatePricesManually() {
+    try {
+      const response = await ApiService.post('/api/coins/update-prices');
+      console.log('Manual price update triggered:', response);
+      return response;
+    } catch (error) {
+      console.error('Error triggering manual price update:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get price data status (for monitoring)
+   * @returns {Promise} Promise that resolves to status object
+   */
+  async getPriceStatus() {
+    try {
+      const response = await ApiService.get('/api/coins/prices/status');
+      return response;
+    } catch (error) {
+      console.error('Error fetching price status:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Transform backend coin data to frontend format
+   * @param {Object} coinData - Raw coin data from backend
+   * @returns {Object} Transformed coin data
+   */
+  transformCoinData(coinData) {
+    if (!coinData) return null;
+
+    const price = coinData.price?.current_price;
+    const change = coinData.price?.change_24h;
+    const isPositive = coinData.price?.is_positive;
+
+    // Import the getCoinImage function
+    const { getCoinImage } = require('../constants/cryptoData');
+
+    return {
+      id: coinData.id,
+      name: coinData.name,
+      symbol: coinData.symbol,
+      color: coinData.color,
+      // Format price for display WITH dollar sign
+      price: price ? `$${price.toFixed(price >= 1 ? 2 : 6)}` : 'N/A',
+      // Format change for display
+      change: change ? `${isPositive ? '+' : ''}${change.toFixed(2)}%` : 'N/A',
+      isPositive: isPositive,
+      // Keep raw values for calculations
+      rawPrice: price,
+      rawChange: change,
+      lastUpdated: coinData.price?.updated_at,
+      // Add any additional fields your frontend needs
+      icon: coinData.symbol?.charAt(0) || '?',
+      imageSource: getCoinImage(coinData.symbol), // Use the getCoinImage function
+      isFavorite: false, // This would be set based on user's favorites
+    };
+  },
+  
+  /**
+   * Get all coins transformed for frontend use
+   * @returns {Promise} Promise that resolves to transformed coins array
+   */
+  async getAllCoinsFormatted() {
+    try {
+      const coins = await this.getAllCoins();
+      return coins.map(coin => this.transformCoinData(coin));
+    } catch (error) {
+      console.error('Error fetching formatted coins:', error);
+      throw error;
+    }
   },
 };
 
