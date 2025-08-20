@@ -1,8 +1,7 @@
 // components/Header.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 
 const Header = () => {
   return (
@@ -15,11 +14,17 @@ const Header = () => {
       <View style={styles.headerContent}>
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
-            <Ionicons name="pulse" size={24} color="white" />
+            <Image 
+              source={require('../../assets/cplogo.png')}   // <--- dein Bild im assets/ Ordner
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Crypto Pulse</Text>
-            <Text style={styles.subtitle}>Track & get notified about your favorite coins</Text>
+            <Text style={styles.subtitle}>
+              Track & get notified about your favorite coins
+            </Text>
           </View>
         </View>
       </View>
@@ -41,27 +46,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     color: 'white',
     marginBottom: 2,
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
+  },
+  logoImage: {
+    width: 70,
+    height: 70,
+    marginRight: 16,
+    tintColor: 'white',
+    alignSelf: 'flex-start',
+    marginTop: 20,
+    marginLeft: 2,
   },
 });
 
