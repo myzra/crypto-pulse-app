@@ -1,23 +1,41 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
-const NotificationItem = ({ 
-  icon, iconColor, iconBg, title, subtitle, frequency, 
-  isActive, onToggle, onSettings, onRemove 
+const NotificationItem = ({
+  id,
+  coinId,
+  title,
+  subtitle,
+  color,
+  imageSource,
+  frequency,
+  isActive,
+  onToggle,
+  onSettings,
+  onRemove
 }) => {
   return (
     <View style={styles.notificationItem}>
       <TouchableOpacity onPress={onToggle} style={styles.notificationLeft}>
-        <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
-          <Ionicons name={icon} size={24} color={iconColor} />
+        <View style={[styles.iconContainer, { backgroundColor: color }]}>
+          {imageSource ? (
+            <Image
+              source={imageSource}
+              style={styles.coinImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <Text style={styles.coinIconText}>
+              {subtitle?.charAt(0) || '?'}
+            </Text>
+          )}
         </View>
         <View style={styles.notificationContent}>
           <Text style={styles.cryptoName}>{title}</Text>
           <Text style={styles.cryptoSymbol}>{subtitle}</Text>
         </View>
       </TouchableOpacity>
-      
+           
       <View style={styles.notificationRight}>
         <View style={styles.statusContainer}>
           <Text style={[styles.statusText, { color: isActive ? '#8663EC' : '#8E8E93' }]}>
@@ -25,7 +43,7 @@ const NotificationItem = ({
           </Text>
           <Text style={styles.frequencyText}>{frequency}</Text>
         </View>
-        
+                
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.actionButton} onPress={onSettings}>
             <Image
@@ -76,6 +94,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+  coinImage: {
+    width: 28,
+    height: 28,
+  },
+  coinIconText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   notificationContent: {
     flex: 1,
