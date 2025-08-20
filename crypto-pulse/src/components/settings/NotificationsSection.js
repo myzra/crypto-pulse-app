@@ -131,41 +131,53 @@ const NotificationsSection = () => {
     }, [isLoggedIn, user?.id, fetchNotifications])
   );
 
-  // Handle toggle notification active status
-  const handleToggleNotification = useCallback(async (notificationId) => {
-    const notification = notifications.find(n => n.id === notificationId);
-    if (!notification) return;
+// Handle toggle notification active status
+const handleToggleNotification = useCallback(async (notificationId) => {
+  const notification = notifications.find(n => n.id === notificationId);
+  if (!notification) return;
 
-    try {
-      // Optimistically update UI
-      setNotifications(prev =>
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, isActive: !n.isActive }
-            : n
-        )
-      );
+  try {
+    // Optimistically update UI
+    setNotifications(prev =>
+      prev.map(n => 
+        n.id === notificationId 
+          ? { ...n, isActive: !n.isActive }
+          : n
+      )
+    );
 
-      // Make API call
-      await notificationsService.updateNotification(notificationId, {
-        is_active: !notification.isActive
-      });
+    // Make API call to toggle status
+    const updatedNotification = await notificationsService.toggleNotificationStatus(notificationId);
+    
+    // Update with the actual response from server (includes updated next_scheduled_at, etc.)
+    setNotifications(prev =>
+      prev.map(n => 
+        n.id === notificationId 
+          ? { 
+              ...n, 
+              isActive: updatedNotification.is_active,
+              nextScheduledAt: updatedNotification.next_scheduled_at,
+              updatedAt: updatedNotification.updated_at
+            }
+          : n
+      )
+    );
 
-    } catch (error) {
-      console.error('Error toggling notification:', error);
-      
-      // Revert optimistic update on error
-      setNotifications(prev =>
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, isActive: notification.isActive } // Revert to original state
-            : n
-        )
-      );
-      
-      Alert.alert('Error', 'Failed to update notification status');
-    }
-  }, [notifications]);
+  } catch (error) {
+    console.error('Error toggling notification:', error);
+    
+    // Revert optimistic update on error
+    setNotifications(prev =>
+      prev.map(n => 
+        n.id === notificationId 
+          ? { ...n, isActive: notification.isActive } // Revert to original state
+          : n
+      )
+    );
+    
+    Alert.alert('Error', 'Failed to update notification status');
+  }
+}, [notifications]);
 
   // Handle settings button press - opens notification modal for editing
   const handleSettings = useCallback((notificationId) => {

@@ -239,7 +239,7 @@ export const coinsService = {
       isFavorite: false, // This would be set based on user's favorites
     };
   },
-  
+
   /**
    * Get all coins transformed for frontend use
    * @returns {Promise} Promise that resolves to transformed coins array
@@ -314,6 +314,14 @@ export const notificationsService = {
     return ApiService.put(`/api/notifications/${notificationId}`, updateData);
   },
 
+ /**
+ * Toggle notification active status
+ * @param {string} notificationId - Notification ID
+ */
+  async toggleNotificationStatus(notificationId) {
+    return ApiService.put(`/api/notifications/${notificationId}/toggle`);
+  },
+  
   /**
 * Check if user has an active notification for a specific coin
 * @param {string} userId - User ID

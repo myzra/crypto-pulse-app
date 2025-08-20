@@ -268,7 +268,10 @@ def delete_notification(
         )
     
     # Soft delete by setting is_active to False
-    notification.is_active = False
+    # notification.is_active = False
+    
+    # Hard delete 
+    db.delete(notification)
     db.commit()
     
     return None
@@ -428,4 +431,59 @@ def update_notification_by_user_coin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while updating the notification"
+        )
+        
+@router.put("/{notification_id}/toggle", response_model=NotificationResponse)
+def toggle_notification_status(
+    notification_id: uuid.UUID,
+    db: Session = Depends(get_db)
+):
+    """Toggle the is_active status of a notification"""
+    
+    # Find the notification
+    notification = db.query(Notification).filter(Notification.id == notification_id).first()
+    if not notification:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Notification not found"
+        )
+    
+    # Toggle the is_active status
+    notification.is_active = not notification.is_active
+    
+    # If activating the notification, recalculate next_scheduled_at
+    if notification.is_active:
+        # Convert preferred_day back to string for calculation
+        preferred_day_str = None
+        if notification.preferred_day is not None:
+            day_names = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+            preferred_day_str = day_names[notification.preferred_day]
+        
+        # Convert preferred_time back to string for calculation
+        preferred_time_str = None
+        if notification.preferred_time:
+            preferred_time_str = notification.preferred_time.strftime('%H:%M')
+        
+        # Recalculate next scheduled time
+        next_scheduled_at = calculate_next_scheduled_time(
+            notification.frequency_type,
+            notification.interval_hours,
+            preferred_time_str,
+            preferred_day_str
+        )
+        notification.next_scheduled_at = next_scheduled_at
+    else:
+        # If deactivating, clear the next_scheduled_at
+        notification.next_scheduled_at = None
+    
+    try:
+        db.commit()
+        db.refresh(notification)
+        return notification
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while toggling notification status"
         )
