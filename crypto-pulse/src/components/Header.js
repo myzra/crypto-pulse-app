@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 const Header = () => {
   return (
     <LinearGradient
-      colors={['#6C5CE7', '#A29BFE']}
+      colors={['#470AFF', '#C0A8FA']} // Verlauf: links blau-lila, rechts pastel-lila
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={styles.header}
