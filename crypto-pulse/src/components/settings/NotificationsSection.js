@@ -25,7 +25,7 @@ const NotificationsSection = () => {
   const formatFrequency = (frequencyType, intervalHours, preferredTime, preferredDay) => {
     switch (frequencyType) {
       case 'hourly':
-        return `Every ${intervalHours} hour${intervalHours !== 1 ? 's' : ''}`;
+        return `Every ${intervalHours || 1} hour${(intervalHours || 1) !== 1 ? 's' : ''}`;      
       case 'daily':
         if (preferredTime) {
           const time = new Date(`2000-01-01T${preferredTime}`);
