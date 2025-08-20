@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import NotificationItem from './NotificationItem';
+import NotificationModal from '../NotificationModal';
 import { notificationsService, coinsService } from '../../services/api';
 import { getCoinImage } from '../../constants/cryptoData';
 import { useUser } from '../../context/UserContext';
@@ -10,6 +11,8 @@ const NotificationsSection = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false);
+  const [selectedCoin, setSelectedCoin] = useState(null);
   const { user, isLoggedIn } = useUser();
 
   // Helper function to get default colors if not set in database
@@ -164,19 +167,78 @@ const NotificationsSection = () => {
     }
   }, [notifications]);
 
-  // Handle settings button press (placeholder for now)
+  // Handle settings button press - opens notification modal for editing
   const handleSettings = useCallback((notificationId) => {
-    console.log('Settings for notification:', notificationId);
-    // TODO: Implement settings functionality
-    Alert.alert('Settings', 'Settings functionality will be implemented soon');
-  }, []);
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification) return;
 
-  // Handle remove notification (placeholder for now)
+    // Create coin object from notification data for the modal
+    const coinData = {
+      id: notification.coinId,
+      name: notification.coinName,
+      symbol: notification.coinSymbol,
+      color: notification.coinColor,
+      imageSource: notification.imageSource,
+      // Add any additional properties the modal might need
+      price: '$0.00', // You might want to fetch current price or store it
+      change: '0%', // You might want to fetch current change or store it
+      isPositive: true
+    };
+
+    setSelectedCoin(coinData);
+    setIsNotificationModalVisible(true);
+  }, [notifications]);
+
+  // Handle notification modal confirmation
+  const handleNotificationConfirm = useCallback(async (result, action) => {
+    try {
+      // Refresh the notifications list to get the updated data
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error in handleNotificationConfirm:', error);
+      Alert.alert('Error', 'Failed to update notification status. Please refresh.');
+    }
+  }, [fetchNotifications]);
+
+  // Handle remove notification
   const handleRemove = useCallback((notificationId) => {
-    console.log('Remove notification:', notificationId);
-    // TODO: Implement remove functionality
-    Alert.alert('Remove', 'Remove functionality will be implemented soon');
-  }, []);
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification) return;
+
+    Alert.alert(
+      'Remove Notification',
+      `Are you sure you want to remove notifications for ${notification.coinName}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => removeNotification(notificationId)
+        }
+      ]
+    );
+  }, [notifications]);
+
+  // Remove notification from database and update UI
+  const removeNotification = useCallback(async (notificationId) => {
+    try {
+      // Optimistically remove from UI
+      const originalNotifications = [...notifications];
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+
+      // Make API call
+      await notificationsService.deleteNotification(notificationId);
+
+      Alert.alert('Success', 'Notification removed successfully');
+    } catch (error) {
+      console.error('Error removing notification:', error);
+      
+      // Revert optimistic update on error
+      setNotifications(originalNotifications);
+      
+      Alert.alert('Error', 'Failed to remove notification');
+    }
+  }, [notifications]);
 
   // Show loading state
   if (loading) {
@@ -250,6 +312,15 @@ const NotificationsSection = () => {
           onRemove={() => handleRemove(notification.id)}
         />
       ))}
+      
+      {/* Notification Modal */}
+      <NotificationModal
+        visible={isNotificationModalVisible}
+        coin={selectedCoin}
+        onClose={() => setIsNotificationModalVisible(false)}
+        onConfirm={handleNotificationConfirm}
+        existingNotification={true}
+      />
     </View>
   );
 };
