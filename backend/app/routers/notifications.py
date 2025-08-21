@@ -248,7 +248,6 @@ def get_user_notifications(
     
     notifications = db.query(Notification).filter(
         Notification.user_id == user_id,
-        Notification.is_active == True
     ).all()
     
     return notifications

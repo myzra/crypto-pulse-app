@@ -98,7 +98,7 @@ const NotificationsSection = () => {
               notification.preferred_time,
               notification.preferred_day
             ),
-            isActive: notification.is_active,
+            isActive: Boolean(notification.is_active),
             frequencyType: notification.frequency_type,
             intervalHours: notification.interval_hours,
             preferredTime: notification.preferred_time,
