@@ -5,7 +5,7 @@ def test_push_notification():
     """Test sending a push notification using your actual push token"""
     
     # Your push token from the database
-    push_token = "ExponentPushToken[HWhvG8O2np7bmFTmOIWS5p]"
+    push_token = "ExponentPushToken[?]"
     
     # Expo push notification endpoint
     url = "https://exp.host/--/api/v2/push/send"
