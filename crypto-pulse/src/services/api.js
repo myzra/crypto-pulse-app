@@ -354,4 +354,38 @@ async checkNotification(userId, coinId) {
  },
 };
 
+// Logs service
+export const logsService = {
+  /**
+   * Get all logs for a user
+   * @param {string} userId - User ID
+   */
+  async getUserLogs(userId) {
+    return ApiService.get(`/api/logs/users/${userId}`);
+  },
+
+  /**
+   * Get all logs (admin only)
+   */
+  async getAllLogs() {
+    return ApiService.get('/api/logs');
+  },
+
+  /**
+   * Delete a specific log
+   * @param {string} logId - Log ID
+   */
+  async deleteLog(logId) {
+    return ApiService.delete(`/api/logs/${logId}`);
+  },
+
+  /**
+   * Get user log statistics
+   * @param {string} userId - User ID
+   */
+  async getUserLogStats(userId) {
+    return ApiService.get(`/api/logs/stats/${userId}`);
+  },
+};
+
 export default ApiService;
