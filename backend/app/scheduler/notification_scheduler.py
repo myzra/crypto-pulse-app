@@ -232,7 +232,6 @@ def send_notification_to_client(notification: Notification, db: Session):
         # Get user and coin data for the notification
         user = db.query(User).filter(User.id == notification.user_id).first()
         coin = db.query(Coin).filter(Coin.id == notification.coin_id).first()
-        logging.info("banan")
         
         if not user:
             logger.error(f"User not found for notification {notification.id}")
