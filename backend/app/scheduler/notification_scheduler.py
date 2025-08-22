@@ -61,13 +61,9 @@ def calculate_next_scheduled_time(
     now = datetime.now(timezone.utc)
     
     if frequency_type == 'hourly':
-        # For hourly, add 1 hour to the current time, then round to next hour
-        next_time = now + timedelta(hours=1)
-        # Round up to the next full hour
-        next_hour = next_time.replace(minute=0, second=0, microsecond=0)
-        if next_time.minute > 0 or next_time.second > 0:
-            next_hour += timedelta(hours=1)
-        return next_hour.replace(tzinfo=timezone.utc)
+        # Set to next full hour
+        next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+        return next_hour
     
     elif frequency_type == 'custom' and interval_hours:
         next_time = now + timedelta(hours=interval_hours)
