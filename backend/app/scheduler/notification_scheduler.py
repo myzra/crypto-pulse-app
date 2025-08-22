@@ -67,7 +67,7 @@ def calculate_next_scheduled_time(
     
     elif frequency_type == 'custom' and interval_hours:
         next_time = now + timedelta(hours=interval_hours)
-        return next_time.replace(tzinfo=timezone.utc)
+        return next_time
     
     elif frequency_type == 'daily' and preferred_time_str:
         # Parse preferred time
