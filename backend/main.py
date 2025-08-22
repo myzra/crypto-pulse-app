@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
-from app.routers import auth, users, coins, favorites, notifications
+from app.routers import auth, users, coins, favorites, notifications, logs
 from app.database import init_db
 from app.services import price_service
 
@@ -40,6 +40,7 @@ app.include_router(price_service.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(coins.router, prefix="/api/coins", tags=["Coins"])
 app.include_router(favorites.router, prefix="/api/favorites", tags=["Favorites"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
+app.include_router(logs.router, prefix="/api/logs", tags=["logs"])
 
 
 @app.on_event("startup")
