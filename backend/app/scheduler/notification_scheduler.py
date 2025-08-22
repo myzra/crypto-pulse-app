@@ -97,9 +97,8 @@ def calculate_next_scheduled_time(
             days_ahead += 7
         
         next_date = now.date() + timedelta(days=days_ahead)
-        next_time = datetime.combine(next_date, preferred_time_obj)
-        next_time = next_time.replace(tzinfo=timezone.utc)
-        
+        next_time = datetime.combine(next_date, preferred_time_obj, tzinfo=timezone.utc)
+
         return next_time
     
     # Fallback - schedule for 1 hour from now
