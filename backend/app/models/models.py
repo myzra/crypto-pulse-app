@@ -51,6 +51,7 @@ class User(Base):
     favorites = relationship("Favorite", back_populates="user", cascade="all, delete-orphan")
     logs = relationship("Log", back_populates="user", cascade="all, delete-orphan")
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    push_token = relationship("UserPushToken", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
 class Coin(Base):
     __tablename__ = "coins"
@@ -132,3 +133,22 @@ class Notification(Base):
 
     user = relationship("User", back_populates="notifications")
     coin = relationship("Coin", back_populates="notifications")
+
+class UserPushToken(Base):
+    __tablename__ = "user_push_tokens"
+    __table_args__ = {"schema": "public"}
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("auth.users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True
+    )
+    push_token = Column(Text, nullable=False)
+    
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+    # Relationship back to User (falls dein User-Model das auch hat)
+    user = relationship("User", back_populates="push_token")
