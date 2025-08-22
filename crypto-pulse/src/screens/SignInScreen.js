@@ -54,6 +54,10 @@ const SignInScreen = ({ navigation }) => { // Remove setIsAuthenticated prop
       console.log('Response status: 200');
       console.log('Response data:', result);
 
+      console.log('User data from backend:', result.user);
+      console.log('User ID:', result.user?.id);
+      console.log('User object keys:', Object.keys(result.user || {}));
+
       // Use the context login function instead of setIsAuthenticated
       if (result.user) {
         login(result.user); // Pass the user data to context

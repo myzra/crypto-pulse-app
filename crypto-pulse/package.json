@@ -37,7 +37,10 @@
     "react-native-tab-view": "^4.1.2",
     "react-native-url-polyfill": "^2.0.0",
     "typescript": "~5.8.3",
-    "expo-blur": "~14.1.5"
+    "expo-blur": "~14.1.5",
+    "expo-notifications": "~0.31.4",
+    "expo-device": "~7.1.4",
+    "expo-constants": "~17.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
