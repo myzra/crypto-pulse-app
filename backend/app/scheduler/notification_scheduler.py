@@ -74,8 +74,7 @@ def calculate_next_scheduled_time(
         preferred_time_obj = datetime.strptime(preferred_time_str, '%H:%M').time()
         
         # Create datetime for today at preferred time (UTC)
-        today_preferred = datetime.combine(now.date(), preferred_time_obj)
-        today_preferred = today_preferred.replace(tzinfo=timezone.utc)
+        today_preferred = datetime.combine(now.date(), preferred_time_obj, tzinfo=timezone.utc)
         
         # If the time has already passed today, schedule for tomorrow
         if today_preferred <= now:
