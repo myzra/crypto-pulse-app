@@ -7,6 +7,7 @@ import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 import FavScreen from '../screens/FavScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import LogScreen from '../screens/LogScreen'
 import { useUser } from '../context/UserContext'; // Import your user context
 
 const Stack = createStackNavigator();
@@ -20,6 +21,7 @@ const MainTabNavigator = () => {
         tabBarStyle: { display: 'none' },
       }}
     >
+      <Tab.Screen name="Logs" component={LogScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Favorites" component={FavScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />

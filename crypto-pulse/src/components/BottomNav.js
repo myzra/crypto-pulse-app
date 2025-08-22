@@ -15,9 +15,7 @@ const BottomNav = () => {
     <View style={styles.bottomNav}>
       <TouchableOpacity
         style={[styles.navItem, isActive('notifications')]}
-        onPress={() => {
-          // navigation.navigate('Notifications'); // Optional
-        }}
+        onPress={() => navigation.navigate('Logs')}
       >
         <Image
           source={require('../../assets/navbar/NavNotifications.png')}
