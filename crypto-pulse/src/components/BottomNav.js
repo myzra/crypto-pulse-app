@@ -14,12 +14,12 @@ const BottomNav = () => {
   return (
     <View style={styles.bottomNav}>
       <TouchableOpacity
-        style={[styles.navItem, isActive('notifications')]}
+        style={[styles.navItem, isActive('logs')]}
         onPress={() => navigation.navigate('Logs')}
       >
         <Image
           source={require('../../assets/navbar/NavNotifications.png')}
-          style={[styles.navIcon, { tintColor: getIconColor('notifications') }]}
+          style={[styles.navIcon, { tintColor: getIconColor('logs') }]}
           resizeMode="contain"
         />
       </TouchableOpacity>
