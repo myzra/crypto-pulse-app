@@ -22,6 +22,7 @@ import CoinList from '../components/CoinList';
 import { coinsService, favoritesService } from '../services/api';
 import { getCoinImage } from '../constants/cryptoData';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../constants/theme';
 
 const HomeScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -29,11 +30,11 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user, isLoggedIn } = useUser();
+  const { theme, isDarkMode } = useTheme();
 
   // Helper function to get default colors if not set in database
   const getDefaultColor = (index) => {
-    const colors = ['#FFEDD5', '#DBEAFE', '#F3E8FF', '#ECFDF5', '#FEF3C7'];
-    return colors[index % colors.length];
+    return theme.coinColors[index % theme.coinColors.length];
   };
 
   const fetchCoins = async () => {
@@ -133,15 +134,58 @@ const HomeScreen = () => {
       coin.symbol.toLowerCase().includes(searchText.toLowerCase())
     ), [coins, searchText]
   );
+  // Create themed styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      backgroundColor: theme.background,
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: theme.textSecondary,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      backgroundColor: theme.background,
+    },
+    errorText: {
+      fontSize: 16,
+      color: theme.error,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    retryButton: {
+      backgroundColor: theme.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    retryButtonText: {
+      color: theme.background,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusbarStyle} />
         <Header />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading coins...</Text>
+        <View style={themedStyles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.ActivityIndicator} />
+          <Text style={themedStyles.loadingText}>Loading coins...</Text>
         </View>
         <BottomNav active="home" />
       </SafeAreaView>
@@ -149,8 +193,8 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={themedStyles.container}>
+      <StatusBar barStyle={theme.statusBarStyle} />
       
       {/* Header with gradient background */}
       <Header />
@@ -164,10 +208,10 @@ const HomeScreen = () => {
 
       {/* Popular Coins Section */}
       {error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchCoins}>
-            <Text style={styles.retryButtonText}>Retry</Text>
+        <View style={themedStyles.errorContainer}>
+          <Text style={themedStyles.errorText}>{error}</Text>
+          <TouchableOpacity style={themedStyles.retryButton} onPress={fetchCoins}>
+            <Text style={themedStyles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -186,60 +230,5 @@ const HomeScreen = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  coinList: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#EF4444',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  retryButton: {
-    backgroundColor: '#3B82F6',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default HomeScreen;
