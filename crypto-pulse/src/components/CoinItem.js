@@ -4,12 +4,14 @@ import { Image } from 'react-native';
 import NotificationModal from './NotificationModal';
 import { useUser } from '../context/UserContext';
 import { notificationsService } from '../services/api';
+import { useTheme } from '../constants/theme';
 
 const CoinItem = ({ coin, onToggleFavorite }) => {
   const { user, isLoggedIn } = useUser(); // Get user from context
   const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false);
   const [hasNotification, setHasNotification] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
 
   // Check for existing notification when component mounts or user changes
   useEffect(() => {
@@ -138,41 +140,134 @@ const CoinItem = ({ coin, onToggleFavorite }) => {
     }
   };
 
+  const themedStyles = StyleSheet.create({
+    coinItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: theme.card,
+      padding: 15,
+      borderRadius: 12,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1},
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    coinLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    coinIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    coinImage: {
+      width: 28,
+      height: 28,
+    },
+    coinIconText: {
+      color: 'white',
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    coinInfo: {
+      flex: 1,
+    },
+    coinName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 2,
+    },
+    coinSymbol: {
+      fontSize: 14,
+      color: theme.textSecondary,
+    },
+    coinRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    priceContainer: {
+      alignItems: 'flex-end',
+      marginRight: 15,
+    },
+    coinPrice: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 2,
+    },
+    coinChange: {
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    starButton: {
+      padding: 8,
+      marginRight: 8,
+    },
+    notificationButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    addButton: {
+      backgroundColor: theme.btnBackgroundColor, // #6366F1 with 10% opacity
+    },
+    checkButton: {
+      backgroundColor: theme.accent,
+    },
+  });
+  
   return (
     <>
-      <View style={styles.coinItem}>
-        <View style={styles.coinLeft}>
-          <View style={[styles.coinIcon, { backgroundColor: coin.color }]}>
+      <View style={themedStyles.coinItem}>
+        <View style={themedStyles.coinLeft}>
+          <View style={[themedStyles.coinIcon, { backgroundColor: coin.color }]}>
             {coin.imageSource ? (
               <Image
                 source={coin.imageSource}
-                style={styles.coinImage}
+                style={themedStyles.coinImage}
                 resizeMode="contain"
               />
             ) : (
-              <Text style={styles.coinIconText}>{coin.icon || coin.symbol?.charAt(0) || '?'}</Text>
+              <Text style={themedStyles.coinIconText}>{coin.icon || coin.symbol?.charAt(0) || '?'}</Text>
             )}
           </View>
-          <View style={styles.coinInfo}>
-            <Text style={styles.coinName}>{coin.name}</Text>
-            <Text style={styles.coinSymbol}>{coin.symbol}</Text>
+          <View style={themedStyles.coinInfo}>
+            <Text style={themedStyles.coinName}>{coin.name}</Text>
+            <Text style={themedStyles.coinSymbol}>{coin.symbol}</Text>
           </View>
         </View>
                 
-        <View style={styles.coinRight}>
-          <View style={styles.priceContainer}>
-            <Text style={styles.coinPrice}>{coin.price}</Text>
+        <View style={themedStyles.coinRight}>
+          <View style={themedStyles.priceContainer}>
+            <Text style={themedStyles.coinPrice}>{coin.price}</Text>
             <Text style={[
-              styles.coinChange,
-              { color: coin.isPositive ? '#10B981' : '#EF4444' }
+              themedStyles.coinChange,
+              { color: coin.isPositive ? theme.success : theme.error }
             ]}>
               {coin.change}
             </Text>
           </View>
                     
-          <View style={styles.actionButtons}>
+          <View style={themedStyles.actionButtons}>
             <TouchableOpacity 
-              style={styles.starButton}
+              style={themedStyles.starButton}
               onPress={handleFavoritePress}
             >
               <Image
@@ -180,15 +275,15 @@ const CoinItem = ({ coin, onToggleFavorite }) => {
                 style={{
                   width: 24,
                   height: 24,
-                  tintColor: coin.isFavorite ? '#8663EC' : '#CCCCCC'
+                  tintColor: coin.isFavorite ? theme.accent : theme.btnFavDisabled
                 }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
             <TouchableOpacity 
               style={[
-                styles.notificationButton,
-                hasNotification ? styles.checkButton : styles.addButton
+                themedStyles.notificationButton,
+                hasNotification ? themedStyles.checkButton : themedStyles.addButton
               ]}
               onPress={handleNotificationPress}
               disabled={loading}
@@ -220,98 +315,5 @@ const CoinItem = ({ coin, onToggleFavorite }) => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  coinItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1},
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  coinLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  coinIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  coinImage: {
-    width: 28,
-    height: 28,
-  },
-  coinIconText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  coinInfo: {
-    flex: 1,
-  },
-  coinName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 2,
-  },
-  coinSymbol: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  coinRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-    marginRight: 15,
-  },
-  coinPrice: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 2,
-  },
-  coinChange: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  starButton: {
-    padding: 8,
-    marginRight: 8,
-  },
-  notificationButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addButton: {
-    backgroundColor: 'rgba(99, 102, 241, 0.1)', // #6366F1 with 10% opacity
-  },
-  checkButton: {
-    backgroundColor: '#8663EC',
-  },
-});
 
 export default CoinItem;

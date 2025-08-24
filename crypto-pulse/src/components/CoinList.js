@@ -3,6 +3,7 @@ import React, { useMemo, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import CoinItem from './CoinItem';
 import { useCoins } from '../hooks/useCoins';
+import { useTheme } from '../constants/theme';
 
 const CoinList = ({ 
   title = 'Coins', 
@@ -16,6 +17,8 @@ const CoinList = ({
   // Refresh function for external data
   onRefresh: externalRefresh,
 }) => {
+  const { theme } = useTheme();
+
   // Use the coins hook for automatic price updates
   const {
     coins: hookCoins,
@@ -121,23 +124,43 @@ const CoinList = ({
     }
   }, [lastUpdated]);
 
+  const themedStyles = StyleSheet.create({
+    container: {
+      paddingHorizontal: 20,
+      paddingTop: 20,
+      flex: 1,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: 15,
+    },
+    flatList: {
+      flex: 1,
+    },
+    contentContainer: {
+      paddingBottom: 20,
+    },
+  });
+
   // Show error state
   if (error && !externalData) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Error loading coins</Text>
-          <Text style={styles.errorSubtext}>{error}</Text>
+      <View style={themedStyles.container}>
+        <Text style={themedStyles.title}>{title}</Text>
+        <View style={themedStyles.errorContainer}>
+          <Text style={themedStyles.errorText}>Error loading coins</Text>
+          <Text style={themedStyles.errorSubtext}>{error}</Text>
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>{title}</Text>
+    <View style={themedStyles.container}>
+      <View style={themedStyles.headerContainer}>
+        <Text style={themedStyles.title}>{title}</Text>
       </View>
       
       <FlatList
@@ -152,19 +175,19 @@ const CoinList = ({
         initialNumToRender={15}
         windowSize={10}
         legacyImplementation={false}
-        style={styles.flatList}
-        contentContainerStyle={styles.contentContainer}
+        style={themedStyles.flatList}
+        contentContainerStyle={themedStyles.contentContainer}
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
             onRefresh={onRefresh}
-            colors={['#8663EC']} // Android
-            tintColor="#8663EC" // iOS
+            colors={[theme.accent]} // Android
+            tintColor={theme.accent} // iOS
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
+          <View style={themedStyles.emptyContainer}>
+            <Text style={themedStyles.emptyText}>
               {isLoading ? 'Loading coins...' : 'No coins available'}
             </Text>
           </View>
@@ -173,25 +196,5 @@ const CoinList = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    flex: 1,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 15,
-  },
-  flatList: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 20,
-  },
-});
 
 export default CoinList;
