@@ -85,7 +85,7 @@ __🔐 User Authentication__
 ## 📂 Project Structure
 | 📁 Path               | 📝 Description                               |
 |-----------------------|----------------------------------------------|
-| `/backend/`           |Backend service built with Flask. Handles API, authentication, database, scheduling, and business logic.|
+| `/backend/`           |Backend service built with FastAPI. Handles API, authentication, database, scheduling, and business logic.|
 | `├── app/`            |Main application package containing all backend modules.|
 | `│   └── /crud/`      |CRUD operations (Create, Read, Update, Delete) for database entities.|
 | `│      └── __init__.py`|Package initializer.|
@@ -117,7 +117,7 @@ __🔐 User Authentication__
 | `│   └── /config.py`  |Application configuration (environment variables, constants).|
 | `│   └── /database.py`  |Database connection and session handling.|
 | `├── .env`            |Environment variables for the backend (DB connection, API keys, secrets).|
-| `├── main.py`            |Entry point for the Flask backend (runs the server).|
+| `├── main.py`            |Entry point for the FastAPI backend (runs the server).|
 | `├── requirements.txt`            |Python dependencies for the backend.|
 | `├── simple_test.py`            |Simple test script for backend functionality.|
 | `├── test-database.py`            |Script to test database connection and queries.|
@@ -153,7 +153,7 @@ __🔐 User Authentication__
 | `│      └── SignInScreen.js`|User login screen.|
 | `│      └── SignUpScreen.js`|User registration screen.|
 | `│   └── services/`|Services and API calls.|
-| `│      └── api.js`|Handles communication with Flask backend & Supabase.|
+| `│      └── api.js`|Handles communication with FastAPI backend & Supabase.|
 | `│      └── pushNotifications.js`|Manages push notification logic.|
 | `├── .env`  |Environment variables for the frontend (API URL, keys).|
 | `├── App.js`  |Main entry point of the React Native app.|
