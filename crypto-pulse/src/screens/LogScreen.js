@@ -19,8 +19,9 @@ import SearchBar from '../components/SearchBar';
 import { logsService } from '../services/api';
 import { getCoinImage } from '../constants/cryptoData';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../constants/theme';
 
-const LogItem = ({ log }) => {
+const LogItem = ({ log, theme }) => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return {
@@ -33,40 +34,131 @@ const LogItem = ({ log }) => {
   const changePercent = parseFloat(log.change_percent);
   const isPositive = changePercent >= 0;
 
+  const logItemStyles = StyleSheet.create({
+    logItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: theme.card,
+      padding: 15,
+      borderRadius: 12,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      shadowColor: theme.cardShadow,
+      shadowOffset: { width: 0, height: 1},
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    logLeft: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      flex: 1,
+    },
+    coinIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    coinImage: {
+      width: 28,
+      height: 28,
+    },
+    coinIconText: {
+      color: theme.text,
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    logInfo: {
+      flex: 1,
+    },
+    coinName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 2,
+    },
+    coinSymbol: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      marginBottom: 4,
+    },
+    logMessage: {
+      fontSize: 12,
+      color: theme.accent,
+      fontStyle: 'italic',
+      flexWrap: 'wrap',
+    },
+    logRight: {
+      alignItems: 'flex-end',
+    },
+    priceContainer: {
+      alignItems: 'flex-end',
+      marginBottom: 8,
+    },
+    logPrice: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 2,
+    },
+    logChange: {
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    dateContainer: {
+      alignItems: 'flex-end',
+    },
+    logDate: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      marginBottom: 2,
+    },
+    logTime: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      fontWeight: '500',
+    },
+  });
+
   return (
-    <View style={styles.logItem}>
-      <View style={styles.logLeft}>
-        <View style={[styles.coinIcon, { backgroundColor: log.coin?.color || '#DBEAFE' }]}>
+    <View style={logItemStyles.logItem}>
+      <View style={logItemStyles.logLeft}>
+        <View style={[logItemStyles.coinIcon, { backgroundColor: log.coin?.color || theme.primaryLight }]}>
           {log.coin?.symbol ? (
             <Image
               source={getCoinImage(log.coin.symbol)}
-              style={styles.coinImage}
+              style={logItemStyles.coinImage}
               resizeMode="contain"
             />
           ) : (
-            <Text style={styles.coinIconText}>?</Text>
+            <Text style={logItemStyles.coinIconText}>?</Text>
           )}
         </View>
-        <View style={styles.logInfo}>
-          <Text style={styles.coinName}>{log.coin?.name || 'Unknown Coin'}</Text>
-          <Text style={styles.coinSymbol}>{log.coin?.symbol || 'N/A'}</Text>
-          <Text style={styles.logMessage}>{log.message}</Text>
+        <View style={logItemStyles.logInfo}>
+          <Text style={logItemStyles.coinName}>{log.coin?.name || 'Unknown Coin'}</Text>
+          <Text style={logItemStyles.coinSymbol}>{log.coin?.symbol || 'N/A'}</Text>
+          <Text style={logItemStyles.logMessage}>{log.message}</Text>
         </View>
       </View>
       
-      <View style={styles.logRight}>
-        <View style={styles.priceContainer}>
-          <Text style={styles.logPrice}>${parseFloat(log.price).toLocaleString()}</Text>
+      <View style={logItemStyles.logRight}>
+        <View style={logItemStyles.priceContainer}>
+          <Text style={logItemStyles.logPrice}>${parseFloat(log.price).toLocaleString()}</Text>
           <Text style={[
-            styles.logChange,
-            { color: isPositive ? '#10B981' : '#EF4444' }
+            logItemStyles.logChange,
+            { color: isPositive ? theme.success : theme.error }
           ]}>
             {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
           </Text>
         </View>
-        <View style={styles.dateContainer}>
-          <Text style={styles.logDate}>{date}</Text>
-          <Text style={styles.logTime}>{time}</Text>
+        <View style={logItemStyles.dateContainer}>
+          <Text style={logItemStyles.logDate}>{date}</Text>
+          <Text style={logItemStyles.logTime}>{time}</Text>
         </View>
       </View>
     </View>
@@ -80,6 +172,7 @@ const LogScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const { user, isLoggedIn } = useUser();
+  const { theme, isDarkMode } = useTheme();
 
   const fetchLogs = async (isRefresh = false) => {
     if (!isLoggedIn || !user?.id) {
@@ -137,14 +230,106 @@ const LogScreen = () => {
     fetchLogs(true);
   }, []);
 
+  // Create themed styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 20,
+      paddingTop: 20,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: 15,
+    },
+    logsList: {
+      flex: 1,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      backgroundColor: theme.background,
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: theme.textSecondary,
+    },
+    loginRequiredContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      backgroundColor: theme.background,
+    },
+    loginRequiredText: {
+      fontSize: 16,
+      color: theme.textSecondary,
+      textAlign: 'center',
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      backgroundColor: theme.background,
+    },
+    errorText: {
+      fontSize: 16,
+      color: theme.error,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    retryButton: {
+      backgroundColor: theme.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    retryButtonText: {
+      color: theme.background,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+    },
+    emptyContentContainer: {
+      flexGrow: 1,
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 18,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      marginBottom: 8,
+      fontWeight: '600',
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: theme.textTertiary,
+      textAlign: 'center',
+    },
+  });
+
   // Show login required message if not logged in
   if (!isLoggedIn) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusBarStyle} />
         <Header />
-        <View style={styles.loginRequiredContainer}>
-          <Text style={styles.loginRequiredText}>Please login to view your notification logs</Text>
+        <View style={themedStyles.loginRequiredContainer}>
+          <Text style={themedStyles.loginRequiredText}>Please login to view your notification logs</Text>
         </View>
         <BottomNav active="logs" />
       </SafeAreaView>
@@ -154,12 +339,12 @@ const LogScreen = () => {
   // Loading state
   if (loading && logs.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusBarStyle} />
         <Header />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading notification logs...</Text>
+        <View style={themedStyles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.activityIndicator} />
+          <Text style={themedStyles.loadingText}>Loading notification logs...</Text>
         </View>
         <BottomNav active="logs" />
       </SafeAreaView>
@@ -167,8 +352,8 @@ const LogScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={themedStyles.container}>
+      <StatusBar barStyle={theme.statusBarStyle} />
       
       {/* Header with gradient background */}
       <Header />
@@ -181,40 +366,40 @@ const LogScreen = () => {
       />
 
       {/* Content */}
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>
+      <View style={themedStyles.content}>
+        <Text style={themedStyles.sectionTitle}>
           Last Price Notifications ({filteredLogs.length})
         </Text>
 
         {/* Error State */}
         {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={() => fetchLogs()}>
-              <Text style={styles.retryButtonText}>Retry</Text>
+          <View style={themedStyles.errorContainer}>
+            <Text style={themedStyles.errorText}>{error}</Text>
+            <TouchableOpacity style={themedStyles.retryButton} onPress={() => fetchLogs()}>
+              <Text style={themedStyles.retryButtonText}>Retry</Text>
             </TouchableOpacity>
           </View>
         ) : (
           /* Logs List */
           <ScrollView
-            style={styles.logsList}
+            style={themedStyles.logsList}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={['#8663EC']} // Android
-                tintColor="#8663EC" // iOS
+                colors={[theme.accent]} // Android
+                tintColor={theme.accent} // iOS
               />
             }
-            contentContainerStyle={filteredLogs.length === 0 ? styles.emptyContentContainer : null}
+            contentContainerStyle={filteredLogs.length === 0 ? themedStyles.emptyContentContainer : null}
           >
             {filteredLogs.length === 0 ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
+              <View style={themedStyles.emptyContainer}>
+                <Text style={themedStyles.emptyText}>
                   {searchText ? 'No matching logs found' : 'No notification logs yet'}
                 </Text>
-                <Text style={styles.emptySubtext}>
+                <Text style={themedStyles.emptySubtext}>
                   {searchText 
                     ? `Try searching for different coin names or symbols`
                     : 'Your push notification history will appear here'
@@ -223,7 +408,7 @@ const LogScreen = () => {
               </View>
             ) : (
               filteredLogs.map((log, index) => (
-                <LogItem key={`${log.id}-${index}`} log={log} />
+                <LogItem key={`${log.id}-${index}`} log={log} theme={theme} />
               ))
             )}
           </ScrollView>
@@ -235,181 +420,5 @@ const LogScreen = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  logsList: {
-    flex: 1,
-  },
-  logItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1},
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  logLeft: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    flex: 1,
-  },
-  coinIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  coinImage: {
-    width: 28,
-    height: 28,
-  },
-  coinIconText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  logInfo: {
-    flex: 1,
-  },
-  coinName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 2,
-  },
-  coinSymbol: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  logMessage: {
-    fontSize: 12,
-    color: '#8B5CF6',
-    fontStyle: 'italic',
-    flexWrap: 'wrap',
-  },
-  logRight: {
-    alignItems: 'flex-end',
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 8,
-  },
-  logPrice: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 2,
-  },
-  logChange: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  dateContainer: {
-    alignItems: 'flex-end',
-  },
-  logDate: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 2,
-  },
-  logTime: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
-  },
-  loginRequiredContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  loginRequiredText: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#EF4444',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  retryButton: {
-    backgroundColor: '#3B82F6',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  emptyContentContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontSize: 18,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 8,
-    fontWeight: '600',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#9CA3AF',
-    textAlign: 'center',
-  },
-});
 
 export default LogScreen;
