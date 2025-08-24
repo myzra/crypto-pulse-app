@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { useUser } from '../context/UserContext';
 import { notificationsService } from '@/services/api';
+import { useTheme } from '../constants/theme';
+
 
 const NotificationModal = ({ visible, coin, onClose, onConfirm }) => {
   const { user } = useUser();
@@ -20,7 +22,8 @@ const NotificationModal = ({ visible, coin, onClose, onConfirm }) => {
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [customHours, setCustomHours] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const { theme } = useTheme();
+  
   const frequencies = [
     { id: 'hourly', label: 'Hourly', icon: '🕐' },
     { id: 'daily', label: 'Daily', icon: '📅' },
@@ -185,13 +188,14 @@ const handleConfirm = async () => {
     if (selectedFrequency === 'Custom') {
       return (
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Every X Hours</Text>
-          <View style={styles.timeCard}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Every X Hours</Text>
+          <View style={[styles.timeCard, { backgroundColor: theme.inputBackground }]}>
             <TextInput
-              style={styles.customInput}
+              style={[styles.customInput, { color: theme.text }]}
               value={customHours}
               onChangeText={setCustomHours}
               placeholder="Enter hours (e.g., 4, 12, 72)"
+              placeholderTextColor={theme.inputPlaceholder}
               keyboardType="numeric"
               textAlign="center"
               editable={!isLoading}
@@ -203,7 +207,7 @@ const handleConfirm = async () => {
 
     return (
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>Preferred Time</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Preferred Time</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.timeScrollContainer}>
           <View style={styles.timeGrid}>
             {timeSlots.map((time) => (
@@ -211,14 +215,16 @@ const handleConfirm = async () => {
                 key={time}
                 style={[
                   styles.timeSlot,
-                  preferredTime === time && styles.timeSlotSelected
+                  { backgroundColor: theme.inputBackground, borderColor: theme.inputBackground },
+                  preferredTime === time && { borderColor: theme.accent, backgroundColor: theme.background }
                 ]}
                 onPress={() => handleTimeSelect(time)}
                 disabled={isLoading}
               >
                 <Text style={[
                   styles.timeSlotText,
-                  preferredTime === time && styles.timeSlotTextSelected
+                  { color: theme.text },
+                  preferredTime === time && { color: theme.accent, fontWeight: '700' }
                 ]}>
                   {time}
                 </Text>
@@ -237,7 +243,7 @@ const handleConfirm = async () => {
 
     return (
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>Preferred Day</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Preferred Day</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayScrollContainer}>
           <View style={styles.dayGrid}>
             {days.map((day) => (
@@ -245,14 +251,16 @@ const handleConfirm = async () => {
                 key={day}
                 style={[
                   styles.daySlot,
-                  selectedDay === day && styles.daySlotSelected
+                  { backgroundColor: theme.inputBackground, borderColor: theme.inputBackground },
+                  selectedDay === day && { borderColor: theme.accent, backgroundColor: theme.background }
                 ]}
                 onPress={() => handleDaySelect(day)}
                 disabled={isLoading}
               >
                 <Text style={[
                   styles.daySlotText,
-                  selectedDay === day && styles.daySlotTextSelected
+                  { color: theme.text },
+                  selectedDay === day && { color: theme.accent, fontWeight: '700' }
                 ]}>
                   {day.substring(0, 3)}
                 </Text>
@@ -265,6 +273,214 @@ const handleConfirm = async () => {
   };
 
   if (!coin) return null;
+
+  const styles = StyleSheet.create({
+    overlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      paddingHorizontal: 20,
+    },
+    modalContainer: {
+      width: '100%',
+      maxWidth: 400,
+      height: 650,
+      backgroundColor: theme.background,
+      borderRadius: 16,
+      padding: 20,
+      elevation: 10,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+    },
+    headerTitle: {
+      fontSize: 26,
+      fontWeight: '700',
+      marginBottom: 20,
+      textAlign: 'center',
+      color: theme.text,
+    },
+    coinCard: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 20,
+    },
+    coinLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    coinIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 10,
+    },
+    coinImage: { width: 24, height: 24 },
+    coinIconText: { 
+      fontWeight: 'bold', 
+      fontSize: 16,
+      color: theme.text,
+    },
+    coinName: { 
+      fontSize: 16, 
+      fontWeight: '600',
+      color: theme.text,
+    },
+    coinSymbol: { 
+      fontSize: 14, 
+      color: theme.textSecondary,
+    },
+    coinRight: { alignItems: 'flex-end' },
+    coinPrice: { 
+      fontSize: 16, 
+      fontWeight: '700',
+      color: theme.text,
+    },
+    coinChange: { fontSize: 14, fontWeight: '600' },
+
+    contentContainer: {
+      flex: 1,
+      marginBottom: 10,
+    },
+    sectionContainer: {
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 8,
+    },
+    
+    dynamicContentContainer: {
+      minHeight: 160,
+      justifyContent: 'flex-start',
+      marginBottom: 10,
+    },
+
+    frequencyGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    frequencyButton: {
+      width: '48%',
+      backgroundColor: theme.inputBackground,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: 'center',
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.inputBackground,
+    },
+    frequencyButtonSelected: {
+      borderColor: theme.accent,
+      backgroundColor: theme.background,
+    },
+    frequencyLabel: {
+      fontSize: 15,
+      color: theme.text,
+    },
+    frequencyLabelSelected: {
+      color: theme.accent,
+      fontWeight: '700',
+    },
+    timeCard: {
+      borderRadius: 12,
+      padding: 16,
+      alignItems: 'center',
+      marginBottom: 15,
+    },
+    
+    timeScrollContainer: {
+      maxHeight: 60,
+      marginBottom: 15,
+    },
+    timeGrid: {
+      flexDirection: 'row',
+      paddingHorizontal: 5,
+    },
+    timeSlot: {
+      borderRadius: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      marginRight: 8,
+      borderWidth: 1,
+    },
+    timeSlotText: {
+      fontSize: 14,
+      fontWeight: '600',
+    },
+
+    dayScrollContainer: {
+      maxHeight: 60,
+      marginBottom: 15,
+    },
+    dayGrid: {
+      flexDirection: 'row',
+      paddingHorizontal: 5,
+    },
+    daySlot: {
+      borderRadius: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      marginRight: 8,
+      borderWidth: 1,
+    },
+    daySlotText: {
+      fontSize: 14,
+      fontWeight: '600',
+    },
+
+    customInput: {
+      fontSize: 18,
+      fontWeight: '600',
+      minWidth: 150,
+      textAlign: 'center',
+    },
+
+    buttonContainer: {
+      paddingTop: 10,
+    },
+    confirmButton: {
+      backgroundColor: theme.accent,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    confirmButtonText: { 
+      color: '#fff', 
+      fontSize: 16, 
+      fontWeight: '700' 
+    },
+    cancelButton: {
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.borderLight,
+      backgroundColor: theme.background,
+    },
+    cancelButtonText: { 
+      fontSize: 16, 
+      color: theme.textSecondary, 
+      fontWeight: '600' 
+    },
+    disabledButton: {
+      opacity: 0.6,
+    },
+  });
 
   return (
     <Modal
@@ -304,7 +520,7 @@ const handleConfirm = async () => {
               <Text style={styles.coinPrice}>{coin.price}</Text>
               <Text style={[
                 styles.coinChange,
-                { color: coin.isPositive ? '#10B981' : '#EF4444' }
+                { color: coin.isPositive ? theme.success : theme.error }
               ]}>
                 {coin.change}
               </Text>
@@ -315,7 +531,7 @@ const handleConfirm = async () => {
           <View style={styles.contentContainer}>
             {/* Frequency */}
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Notification Frequency</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Notification Frequency</Text>
               <View style={styles.frequencyGrid}>
                 {frequencies.map((freq) => {
                   const isSelected = selectedFrequency.toLowerCase() === freq.id;
@@ -372,222 +588,5 @@ const handleConfirm = async () => {
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark semi-transparent background
-    paddingHorizontal: 20,
-  },
-  modalContainer: {
-    width: '100%',
-    maxWidth: 400, // Fixed maximum width
-    height: 650, // Increased height for better content spacing
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    elevation: 10, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  coinCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  coinLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  coinIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  coinImage: { width: 24, height: 24 },
-  coinIconText: { fontWeight: 'bold', fontSize: 16 },
-  coinName: { fontSize: 16, fontWeight: '600' },
-  coinSymbol: { fontSize: 14, color: '#6B7280' },
-  coinRight: { alignItems: 'flex-end' },
-  coinPrice: { fontSize: 16, fontWeight: '700' },
-  coinChange: { fontSize: 14, fontWeight: '600' },
-
-  contentContainer: {
-    flex: 1, // Takes up remaining space
-    marginBottom: 10, // Reduced margin
-  },
-  sectionContainer: {
-    marginBottom: 20, // Increased margin between sections
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  
-  // Fixed container for dynamic content to prevent size changes
-  dynamicContentContainer: {
-    minHeight: 160, // Increased minimum height for better spacing
-    justifyContent: 'flex-start',
-    marginBottom: 10, // Add bottom margin
-  },
-
-  frequencyGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  frequencyButton: {
-    width: '48%',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  frequencyButtonSelected: {
-    borderColor: '#8B5CF6',
-    backgroundColor: '#fff',
-  },
-  frequencyLabel: {
-    fontSize: 15,
-    color: '#111827',
-  },
-  frequencyLabelSelected: {
-    color: '#8B5CF6',
-    fontWeight: '700',
-  },
-  timeCard: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 15, // Add bottom margin for spacing
-  },
-  
-  // Time selection styles
-  timeScrollContainer: {
-    maxHeight: 60, // Increased height for better visibility
-    marginBottom: 15, // Add bottom margin
-  },
-  timeGrid: {
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-  },
-  timeSlot: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  timeSlotSelected: {
-    borderColor: '#8B5CF6',
-    backgroundColor: '#fff',
-  },
-  timeSlotText: {
-    fontSize: 14,
-    color: '#111827',
-    fontWeight: '600',
-  },
-  timeSlotTextSelected: {
-    color: '#8B5CF6',
-    fontWeight: '700',
-  },
-
-  // Day selection styles
-  dayScrollContainer: {
-    maxHeight: 60, // Increased height for better visibility
-    marginBottom: 15, // Add bottom margin
-  },
-  dayGrid: {
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-  },
-  daySlot: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  daySlotSelected: {
-    borderColor: '#8B5CF6',
-    backgroundColor: '#fff',
-  },
-  daySlotText: {
-    fontSize: 14,
-    color: '#111827',
-    fontWeight: '600',
-  },
-  daySlotTextSelected: {
-    color: '#8B5CF6',
-    fontWeight: '700',
-  },
-
-  // Custom input style
-  customInput: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    minWidth: 150,
-    textAlign: 'center',
-  },
-
-  // Button container
-  buttonContainer: {
-    paddingTop: 10,
-  },
-  confirmButton: {
-    backgroundColor: '#8B5CF6',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  confirmButtonText: { 
-    color: '#fff', 
-    fontSize: 16, 
-    fontWeight: '700' 
-  },
-  cancelButton: {
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  cancelButtonText: { 
-    fontSize: 16, 
-    color: '#6B7280', 
-    fontWeight: '600' 
-  }
-});
 
 export default NotificationModal;
