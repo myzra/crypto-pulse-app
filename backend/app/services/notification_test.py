@@ -61,7 +61,7 @@ def test_push_notification():
 def test_crypto_price_notification():
     """Test sending a crypto price alert"""
     
-    push_token = "ExponentPushToken[HWhvG8O2np7bmFTmOIWS5p]"
+    push_token = "ExponentPushToken[?]"
     url = "https://exp.host/--/api/v2/push/send"
     
     # Bitcoin price alert example
@@ -106,7 +106,7 @@ def test_crypto_price_notification():
 def test_multiple_notifications():
     """Test sending multiple types of notifications"""
     
-    push_token = "ExponentPushToken[HWhvG8O2np7bmFTmOIWS5p]"
+    push_token = "ExponentPushToken[?]"
     url = "https://exp.host/--/api/v2/push/send"
     
     # Multiple messages

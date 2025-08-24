@@ -1,18 +1,14 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
@@ -123,7 +119,6 @@ const FavScreen = () => {
     ), [favoriteCoins, searchText]
   );
   
-  // Create themed styles
   const themedStyles = StyleSheet.create({
     container: {
       flex: 1,

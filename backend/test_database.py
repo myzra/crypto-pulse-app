@@ -11,9 +11,6 @@ from decimal import Decimal
 from datetime import datetime
 import uuid
 
-# Add your app directory to path if needed
-# sys.path.append('path/to/your/app')
-
 from app.database import init_db, close_db, get_db, check_db_health, engine
 from app.models.models import User, Coin, CoinPrice, Favorite, Log, Notification
 from app.crud.crud import UserCRUD, CoinCRUD, CoinPriceCRUD, FavoriteCRUD, LogCRUD, NotificationCRUD

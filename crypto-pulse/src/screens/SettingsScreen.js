@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, SafeAreaView, ScrollView, StyleSheet, StatusBar } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, StatusBar } from 'react-native';
 import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import NotificationsSection from '../components/settings/NotificationsSection';
@@ -11,7 +11,6 @@ const SettingsScreen = () => {
   const [searchText, setSearchText] = useState('');
   const { theme } = useTheme();
 
-  // Create themed styles
   const themedStyles = StyleSheet.create({
     container: {
       flex: 1,

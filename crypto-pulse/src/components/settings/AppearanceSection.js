@@ -22,12 +22,12 @@ const AppearanceSection = () => {
 
   const translateX = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [3, 30], // Adjust based on your track width
+    outputRange: [3, 30],
   });
 
   const trackColor = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [theme.borderLight, theme.accent], // Gray to accent color
+    outputRange: [theme.borderLight, theme.accent],
   });
 
   const styles = StyleSheet.create({

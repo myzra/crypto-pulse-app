@@ -1,23 +1,18 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
-import CoinItem from '../components/CoinItem';
 import CoinList from '../components/CoinList';
 import { coinsService, favoritesService } from '../services/api';
 import { getCoinImage } from '../constants/cryptoData';

@@ -31,7 +31,7 @@ class NotificationCreate(BaseModel):
         if 'frequency_type' in values and values['frequency_type'] == 'custom':
             if v is None or v <= 0:
                 raise ValueError('interval_hours is required and must be positive for custom frequency')
-            if v > 168:  # 1 week in hours
+            if v > 168:  # 1 week
                 raise ValueError('interval_hours cannot exceed 168 hours (1 week)')
         return v
 

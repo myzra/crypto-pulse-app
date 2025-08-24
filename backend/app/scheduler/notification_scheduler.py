@@ -13,7 +13,6 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-# Import your app modules
 from app.database import get_db
 from app.models.models import Notification, User, Coin, UserPushToken, Log
 
@@ -29,7 +28,6 @@ def get_overdue_notifications(db: Session) -> List[Notification]:
     """Get all active notifications that are overdue"""
     now = datetime.now(timezone.utc)
     
-    # Add debug logging
     logger.info(f"Current UTC time: {now}")
     logger.info(f"Looking for notifications with next_scheduled_at <= {now}")
     
@@ -434,12 +432,10 @@ def is_valid_expo_push_token(token: str) -> bool:
     if not token or not isinstance(token, str):
         return False
     
-    # Expo push tokens typically start with ExponentPushToken[ or ExpoPushToken[
-    # and end with ]
     return (
         (token.startswith('ExponentPushToken[') or token.startswith('ExpoPushToken[')) 
         and token.endswith(']')
-        and len(token) > 20  # Reasonable minimum length
+        and len(token) > 20
     )
         
 def update_notification_schedule(notification: Notification, db: Session):

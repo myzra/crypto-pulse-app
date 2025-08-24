@@ -7,7 +7,7 @@ import { notificationsService } from '../services/api';
 import { useTheme } from '../constants/theme';
 
 const CoinItem = ({ coin, onToggleFavorite }) => {
-  const { user, isLoggedIn } = useUser(); // Get user from context
+  const { user, isLoggedIn } = useUser();
   const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false);
   const [hasNotification, setHasNotification] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -101,38 +101,20 @@ const CoinItem = ({ coin, onToggleFavorite }) => {
       setLoading(true);
       console.log('Notification confirmed:', result, action);
       
-      // The API call has already been made in the modal!
-      // We just need to update the UI state here
-      
       if (action === 'created') {
         console.log('New notification created with ID:', result.id);
         setHasNotification(true);
-        // Optional: You can store the notification data for display
-        // setNotificationData(result);
-        
-        // No need to show alert here since the modal already shows success
-        // Alert.alert('Success', 'Notification settings saved successfully');
         
       } else if (action === 'updated') {
         console.log('Notification updated with ID:', result.id);
         setHasNotification(true);
-        // Optional: Update stored notification data
-        // setNotificationData(result);
-        
-        // No need to show alert here since the modal already shows success
-        // Alert.alert('Success', 'Notification settings updated successfully');
         
       } else {
-        // Fallback for old behavior - this shouldn't happen with the new modal
         console.warn('Unknown action type:', action);
         setHasNotification(true);
       }
       
-      // Optional: Refresh any notification lists or UI elements
-      // await refreshNotificationsList();
-      
     } catch (error) {
-      // This should rarely happen now since API calls are in the modal
       console.error('Error in handleNotificationConfirm:', error);
       Alert.alert('Error', 'Failed to update notification status. Please refresh.');
     } finally {
@@ -226,7 +208,7 @@ const CoinItem = ({ coin, onToggleFavorite }) => {
       alignItems: 'center',
     },
     addButton: {
-      backgroundColor: theme.btnBackgroundColor, // #6366F1 with 10% opacity
+      backgroundColor: theme.btnBackgroundColor,
     },
     checkButton: {
       backgroundColor: theme.accent,

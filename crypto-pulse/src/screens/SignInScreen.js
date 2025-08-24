@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { authService } from '../services/api';
-import { useUser } from '../context/UserContext'; // Add this import
+import { useUser } from '../context/UserContext';
 
 const SignInScreen = ({ navigation }) => { // Remove setIsAuthenticated prop
   const [email, setEmail] = useState('');

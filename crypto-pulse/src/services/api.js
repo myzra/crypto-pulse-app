@@ -233,10 +233,9 @@ export const coinsService = {
       rawPrice: price,
       rawChange: change,
       lastUpdated: coinData.price?.updated_at,
-      // Add any additional fields your frontend needs
       icon: coinData.symbol?.charAt(0) || '?',
-      imageSource: getCoinImage(coinData.symbol), // Use the getCoinImage function
-      isFavorite: false, // This would be set based on user's favorites
+      imageSource: getCoinImage(coinData.symbol),
+      isFavorite: false,
     };
   },
 
@@ -255,7 +254,7 @@ export const coinsService = {
   },
 };
 
-// Favorites service (for future use)
+// Favorites service
 export const favoritesService = {
   async getUserFavorites(userId) {
     return ApiService.get(`/api/favorites/users/${userId}/favorites`);

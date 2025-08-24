@@ -48,7 +48,7 @@ const Header = () => {
 
   return (
     <LinearGradient
-      colors={theme.headerGradient} // Verlauf: links blau-lila, rechts pastel-lila
+      colors={theme.headerGradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={themedStyles.header}
@@ -57,7 +57,7 @@ const Header = () => {
         <View style={themedStyles.logoContainer}>
           <View style={themedStyles.logo}>
             <Image 
-              source={require('../../assets/cplogo.png')}   // <--- dein Bild im assets/ Ordner
+              source={require('../../assets/cplogo.png')}
               style={themedStyles.logoImage}
               resizeMode="contain"
             />

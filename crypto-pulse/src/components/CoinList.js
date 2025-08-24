@@ -9,12 +9,9 @@ const CoinList = ({
   title = 'Coins', 
   onToggleFavorite, 
   isUserLoggedIn,
-  // Optional: pass external data if you want to override the hook
   externalData,
-  // Auto-refresh settings
   autoRefresh = true,
   refreshInterval = 5 * 60 * 1000, // 5 minutes
-  // Refresh function for external data
   onRefresh: externalRefresh,
 }) => {
   const { theme } = useTheme();
@@ -27,9 +24,8 @@ const CoinList = ({
     lastUpdated,
     refreshCoins,
     updateCoin,
-  } = useCoins(autoRefresh, refreshInterval); // Always enable auto-refresh for price updates
+  } = useCoins(autoRefresh, refreshInterval);
 
-  // Use external data if provided, otherwise use hook data
   // If external data is provided, merge it with hook data for updated prices
   const data = useMemo(() => {
     if (externalData && hookCoins.length > 0) {
@@ -57,7 +53,7 @@ const CoinList = ({
   // Determine loading state - show loading only when no data is available
   const isLoading = useMemo(() => {
     if (data.length > 0) {
-      return false; // We have data to show, don't show loading
+      return false;
     }
     return loading;
   }, [data.length, loading]);
@@ -101,7 +97,7 @@ const CoinList = ({
 
   // Get item layout to avoid measurement calculations
   const getItemLayout = useCallback((data, index) => ({
-    length: 85, // Approximate height of each CoinItem
+    length: 85,
     offset: 85 * index,
     index,
   }), []);

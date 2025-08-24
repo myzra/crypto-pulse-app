@@ -8,7 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import FavScreen from '../screens/FavScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import LogScreen from '../screens/LogScreen'
-import { useUser } from '../context/UserContext'; // Import your user context
+import { useUser } from '../context/UserContext';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -30,7 +30,7 @@ const MainTabNavigator = () => {
 };
 
 const AppNavigator = () => {
-  const { isLoggedIn } = useUser(); // Use the user context instead of local state
+  const { isLoggedIn } = useUser();
 
   return (
     <NavigationContainer>

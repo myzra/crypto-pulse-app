@@ -11,7 +11,7 @@ const SearchBar = ({ value, onChangeText, placeholder = "Search..." }) => {
     container: {
       paddingHorizontal: 0,
       paddingVertical: 3,
-      backgroundColor: theme.surfaceElevated, // #F3F4F6 in light mode
+      backgroundColor: theme.surfaceElevated,
       marginTop: 15,
       marginHorizontal: 20,
       borderRadius: 15,
@@ -19,19 +19,19 @@ const SearchBar = ({ value, onChangeText, placeholder = "Search..." }) => {
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.inputBackground, // #F5F5F5 in light mode
+      backgroundColor: theme.inputBackground,
       borderRadius: 10,
       paddingHorizontal: 15,
       height: 45,
     },
     searchIcon: {
       marginRight: 10,
-      color: theme.searchIconColor, // #ADAEBC in light mode
+      color: theme.searchIconColor,
     },
     searchInput: {
       flex: 1,
       fontSize: 16,
-      color: theme.inputText, // #ADAEBC in light mode
+      color: theme.inputText,
     },
   });
 
@@ -47,7 +47,7 @@ const SearchBar = ({ value, onChangeText, placeholder = "Search..." }) => {
         <TextInput
           style={themedStyles.searchInput}
           placeholder={placeholder}
-          placeholderTextColor={theme.inputPlaceholder} // #ADAEBC in light mode
+          placeholderTextColor={theme.inputPlaceholder}
           value={value}
           onChangeText={onChangeText}
         />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -230,7 +230,6 @@ const LogScreen = () => {
     fetchLogs(true);
   }, []);
 
-  // Create themed styles
   const themedStyles = StyleSheet.create({
     container: {
       flex: 1,

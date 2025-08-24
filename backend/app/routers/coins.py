@@ -55,7 +55,6 @@ async def should_update_prices(db: Session) -> bool:
         
     except Exception as e:
         logger.error(f"Error checking price update status: {str(e)}")
-        # If we can't determine, err on the side of updating
         return True
 
 async def update_prices_if_needed(db: Session):
