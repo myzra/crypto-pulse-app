@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
-import { View, SafeAreaView, ScrollView, StyleSheet, StatusBar  } from 'react-native';
+import { View, SafeAreaView, ScrollView, StyleSheet, StatusBar } from 'react-native';
 import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import NotificationsSection from '../components/settings/NotificationsSection';
 import AppearanceSection from '../components/settings/AppearanceSection';
 import BottomNav from '../components/BottomNav';
+import { useTheme } from '../constants/theme';
 
 const SettingsScreen = () => {
   const [searchText, setSearchText] = useState('');
+  const { theme } = useTheme();
+
+  // Create themed styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    scrollContent: {
+      flex: 1
+    },
+  });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={themedStyles.container}>
+      <StatusBar barStyle={theme.statusBarStyle} />
       
       <Header />
       <SearchBar
@@ -21,7 +34,8 @@ const SettingsScreen = () => {
       />
       
       <ScrollView 
-        style={styles.scrollContent}
+        style={themedStyles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 25 }}
         showsVerticalScrollIndicator={false}
       >
         <NotificationsSection />
@@ -32,15 +46,5 @@ const SettingsScreen = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scrollContent: {
-    flex: 1,
-  },
-});
 
 export default SettingsScreen;
