@@ -44,6 +44,9 @@ The app integrates with the CoinGecko API to fetch up to 30 cryptocurrencies and
 
 ## 👨‍💻 SignIn / SignUp
 <div style="display: flex; gap: 10px;">
+  <img src="demo/login.png" alt="login" width="300"/>
+  <img src="demo/signup.png" alt="signup" width="300"/>
+</div>
   
 
 ## ✨ Features
