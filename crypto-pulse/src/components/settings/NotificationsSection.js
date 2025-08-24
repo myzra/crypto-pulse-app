@@ -6,6 +6,7 @@ import NotificationModal from '../NotificationModal';
 import { notificationsService, coinsService } from '../../services/api';
 import { getCoinImage } from '../../constants/cryptoData';
 import { useUser } from '../../context/UserContext';
+import { useTheme } from '../../constants/theme';
 
 const NotificationsSection = () => {
   const [notifications, setNotifications] = useState([]);
@@ -14,6 +15,7 @@ const NotificationsSection = () => {
   const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState(null);
   const { user, isLoggedIn } = useUser();
+  const { theme } = useTheme();
 
   // Helper function to get default colors if not set in database
   const getDefaultColor = (index) => {
@@ -252,13 +254,56 @@ const handleToggleNotification = useCallback(async (notificationId) => {
     }
   }, [notifications]);
 
+  const styles = StyleSheet.create({
+    section: {
+      paddingHorizontal: 20,
+      paddingTop: 20,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: 15,
+    },
+    loadingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    loadingText: {
+      marginLeft: 10,
+      fontSize: 14,
+      color: theme.textSecondary,
+    },
+    errorContainer: {
+      padding: 20,
+      alignItems: 'center',
+    },
+    errorText: {
+      fontSize: 14,
+      color: theme.error,
+      textAlign: 'center',
+    },
+    emptyContainer: {
+      padding: 20,
+      alignItems: 'center',
+    },
+    emptyText: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+  });
+
   // Show loading state
   if (loading) {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notifications</Text>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#8663EC" />
+          <ActivityIndicator size="small" color={theme.activityIndicator} />
           <Text style={styles.loadingText}>Loading notifications...</Text>
         </View>
       </View>
@@ -336,48 +381,5 @@ const handleToggleNotification = useCallback(async (notificationId) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  section: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 15,
-  },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#666',
-  },
-  errorContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#EF4444',
-    textAlign: 'center',
-  },
-  emptyContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-});
 
 export default NotificationsSection;
