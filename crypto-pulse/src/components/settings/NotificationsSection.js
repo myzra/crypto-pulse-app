@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import NotificationItem from './NotificationItem';
@@ -151,7 +151,7 @@ const handleToggleNotification = useCallback(async (notificationId) => {
     // Make API call to toggle status
     const updatedNotification = await notificationsService.toggleNotificationStatus(notificationId);
     
-    // Update with the actual response from server (includes updated next_scheduled_at, etc.)
+    // Update with the actual response from server
     setNotifications(prev =>
       prev.map(n => 
         n.id === notificationId 
@@ -182,25 +182,44 @@ const handleToggleNotification = useCallback(async (notificationId) => {
 }, [notifications]);
 
   // Handle settings button press - opens notification modal for editing
-  const handleSettings = useCallback((notificationId) => {
+  const handleSettings = useCallback(async (notificationId) => {
     const notification = notifications.find(n => n.id === notificationId);
     if (!notification) return;
 
-    // Create coin object from notification data for the modal
-    const coinData = {
-      id: notification.coinId,
-      name: notification.coinName,
-      symbol: notification.coinSymbol,
-      color: notification.coinColor,
-      imageSource: notification.imageSource,
-      // Add any additional properties the modal might need
-      price: '$0.00', // You might want to fetch current price or store it
-      change: '0%', // You might want to fetch current change or store it
-      isPositive: true
-    };
-
-    setSelectedCoin(coinData);
-    setIsNotificationModalVisible(true);
+    try {
+      // Fetch current coin data
+      const coinsResponse = await coinsService.getAllCoins();
+      const currentCoin = coinsResponse.find(coin => coin.id === notification.coinId);
+      
+      const coinData = {
+        id: notification.coinId,
+        name: notification.coinName,
+        symbol: notification.coinSymbol,
+        color: notification.coinColor,
+        imageSource: notification.imageSource,
+        price: currentCoin?.price?.current_price ? `$${currentCoin.price.current_price.toLocaleString()}` : 'N/A',
+        change: currentCoin?.price?.change_24h ? `${currentCoin.price.change_24h > 0 ? '+' : ''}${currentCoin.price.change_24h.toFixed(2)}%` : '0.00%',
+        isPositive: currentCoin?.price?.is_positive !== undefined ? currentCoin.price.is_positive : true
+      };
+  
+      setSelectedCoin(coinData);
+      setIsNotificationModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching coin data:', error);
+      // Fall back to original behavior if API fails
+      const coinData = {
+        id: notification.coinId,
+        name: notification.coinName,
+        symbol: notification.coinSymbol,
+        color: notification.coinColor,
+        imageSource: notification.imageSource,
+        price: '$1.00',
+        change: '0%',
+        isPositive: true
+      };
+      setSelectedCoin(coinData);
+      setIsNotificationModalVisible(true);
+    }
   }, [notifications]);
 
   // Handle notification modal confirmation
@@ -236,7 +255,6 @@ const handleToggleNotification = useCallback(async (notificationId) => {
   // Remove notification from database and update UI
   const removeNotification = useCallback(async (notificationId) => {
     try {
-      // Optimistically remove from UI
       const originalNotifications = [...notifications];
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
 
@@ -247,7 +265,6 @@ const handleToggleNotification = useCallback(async (notificationId) => {
     } catch (error) {
       console.error('Error removing notification:', error);
       
-      // Revert optimistic update on error
       setNotifications(originalNotifications);
       
       Alert.alert('Error', 'Failed to remove notification');
