@@ -38,11 +38,11 @@ __🔔 Custom Notifications__
 
 - Flexible intervals:
 
-  - Daily (e.g., every morning at 7:00)
-  - Weekly (e.g., every Tuesday at 8:00)
-  - Hourly (e.g., every 8 hours)
+  - 🗓️ Daily (e.g., every morning at 7:00)
+  - 📅 Weekly (e.g., every Tuesday at 8:00)
+  - ⏰ Hourly (e.g., every 8 hours)
 
-- Edit or delete existing schedules.
+- Edit ✏️ or delete 🗑️ existing schedules.
 
 __📜 Notification Logs__
 
@@ -50,34 +50,34 @@ __📜 Notification Logs__
 
 - Review past notifications at any time
 
-__🎨 Dark Mode__
+__🌙 Dark Mode__
 
-- Toggle between light and dark themes
+- Toggle between light 🌞 and dark 🌚 themes
 
 __🔐 User Authentication__
 
-- Secure login and registration powered by Supabase
+- Secure login 🔑 and registration powered by Supabase
 
 ## 🛠️ Tech Stack
 <table>
   <tr>
-    <td><strong>Frontend</strong></td>
+    <td><strong>📱 Frontend</strong></td>
     <td>React Native (Expo), JavaScript</td>
   </tr>
   <tr>
-    <td><strong>Backend</strong></td>
+    <td><strong>⚙️ Backend</strong></td>
     <td>Python FastAPI, RESTful APIs</td>
   </tr>
   <tr>
-    <td><strong>Database & Auth</strong></td>
+    <td><strong>🗄️ Database & Auth</strong></td>
     <td>Supabase (PostgreSQL + Authentication)</td>
   </tr>
   <tr>
-    <td><strong>External APIs</strong></td>
+    <td><strong>🌐 External APIs</strong></td>
     <td>CoinGecko API for cryptocurrency data</td>
   </tr>
   <tr>
-    <td><strong>Notifications</strong></td>
+    <td><strong>🔔 Notifications</strong></td>
     <td>Custom scheduler service</td>
   </tr>
 </table>
@@ -172,25 +172,25 @@ __🔐 User Authentication__
 > [!NOTE]
 > Make sure the following are installed on your system:
 
-- Python (v3.8 or higher)
-- Node.js(v14 or higher)
-- Expo CLI
-- Supabase account
+- 🐍 Python (v3.8 or higher)
+- 🟢 Node.js(v14 or higher)
+- 📱 Expo CLI
+- 🗄️ Supabase account
 
-### __Clone the Repository__
+### ⬇️ __Clone the Repository__
 ```
 git clone https://github.com/myzra/crypto-pulse-app.git
 cd crypto-pulse-app
 ```
 
-### __Frontend (React Native with Expo)__
+### 📱 __Frontend (React Native with Expo)__
 ```
 cd .\crypto-pulse\
 npm install
 npx expo start
 ```
 
-### __Backend (FastAPI)__
+### ⚙️ __Backend (FastAPI)__
 ```
 cd .\backend\
 python -m venv venv
@@ -199,19 +199,19 @@ pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### __Notification Scheduler__
+### 🔔 __Notification Scheduler__
 ```
 cd PATH\crypto-pulse-app\backend
 >> python -m app.scheduler.notification_scheduler
 ```
 
 ## 🧑‍💻 Roadmap / To-Do
- - Improve notification service (push notifications instead of local scheduling)
- - Add more coins and filtering options
- - Enhance UI with animations and charts
- - Add support for multiple languages
+ - 📲 Improve notification service (push notifications instead of local scheduling)
+ - 💰 Add more coins and filtering options
+ - ✨ Enhance UI with animations and charts
+ - 🌍 Add support for multiple languages
 
 ## 👨‍💻 Author
 Created by [myzra](https://github.com/myzra) \
-[Licensed under the MIT License](LICENSE) \
+📜[Licensed under the MIT License](LICENSE) \
 _👉 This project was built as a portfolio project to demonstrate skills in mobile development, backend integration, and cloud authentication._
