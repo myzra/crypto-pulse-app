@@ -21,6 +21,7 @@ import CoinList from '../components/CoinList';
 import { favoritesService } from '../services/api';
 import { getCoinImage } from '../constants/cryptoData';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../constants/theme';
 
 const FavScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -28,11 +29,11 @@ const FavScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user, isLoggedIn} = useUser();
+  const { theme, isDarkMode } = useTheme();
 
   // Helper function to get default colors
   const getDefaultColor = (index) => {
-    const colors = ['#FFEDD5', '#DBEAFE', '#F3E8FF', '#ECFDF5', '#FEF3C7'];
-    return colors[index % colors.length];
+    return theme.coinColors[index % theme.coinColors.lenght];
   };
 
   // Fetch user's favorite coins
@@ -122,15 +123,76 @@ const FavScreen = () => {
     ), [favoriteCoins, searchText]
   );
   
+  // Create themed styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    centerContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      backgroundColor: theme.background,
+    },
+    loginPromptTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: 10,
+    },
+    loginPromptText: {
+      fontSize: 16,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: theme.textSecondary,
+    },
+    errorText: {
+      fontSize: 16,
+      color: theme.error,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    retryButton: {
+      backgroundColor: theme.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    retryButtonText: {
+      color: theme.background,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    emptyTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: 10,
+    },
+    emptyText: {
+      fontSize: 16,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+  });
+
   // Show login prompt if user is not logged in
   if (!isLoggedIn) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusBarStyle} />
         <Header />
-        <View style={styles.centerContainer}>
-          <Text style={styles.loginPromptTitle}>Login Required</Text>
-          <Text style={styles.loginPromptText}>
+        <View style={themedStyles.centerContainer}>
+          <Text style={themedStyles.loginPromptTitle}>Login Required</Text>
+          <Text style={themedStyles.loginPromptText}>
             Please login to view your favorite cryptocurrencies
           </Text>
         </View>
@@ -142,12 +204,12 @@ const FavScreen = () => {
   // Show loading state
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusBarStyle} />
         <Header />
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#8663EC" />
-          <Text style={styles.loadingText}>Loading favorites...</Text>
+        <View style={themedStyles.centerContainer}>
+          <ActivityIndicator size="large" color={theme.ActivityIndicator} />
+          <Text style={themedStyles.loadingText}>Loading favorites...</Text>
         </View>
         <BottomNav active="star" />
       </SafeAreaView>
@@ -157,13 +219,13 @@ const FavScreen = () => {
   // Show error state
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusBarStyle} />
         <Header />
-        <View style={styles.centerContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchFavorites}>
-            <Text style={styles.retryButtonText}>Retry</Text>
+        <View style={themedStyles.centerContainer}>
+          <Text style={themedStyles.errorText}>{error}</Text>
+          <TouchableOpacity style={themedStyles.retryButton} onPress={fetchFavorites}>
+            <Text style={themedStyles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
         <BottomNav active="star" />
@@ -174,17 +236,17 @@ const FavScreen = () => {
   // Show empty favorites state
   if (favoriteCoins.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={theme.statusBarStyle} />
         <Header />
         <SearchBar
           value={searchText}
           onChangeText={setSearchText}
           placeholder="Search favorite cryptocurrencies..."
         />
-        <View style={styles.centerContainer}>
-          <Text style={styles.emptyTitle}>No Favorites Yet</Text>
-          <Text style={styles.emptyText}>
+        <View style={themedStyles.centerContainer}>
+          <Text style={themedStyles.emptyTitle}>No Favorites Yet</Text>
+          <Text style={themedStyles.emptyText}>
             Start adding cryptocurrencies to your favorites by tapping the star icon on the home screen
           </Text>
         </View>
@@ -194,8 +256,8 @@ const FavScreen = () => {
   }
   
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={themedStyles.container}>
+      <StatusBar barStyle={theme.statusBarStyle} />
       
       {/* Header with gradient background */}
       <Header />
@@ -222,26 +284,5 @@ const FavScreen = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  coinList: {
-    flex: 1,
-    },
-});
 
 export default FavScreen;
