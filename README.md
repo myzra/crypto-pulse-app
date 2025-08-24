@@ -1,6 +1,6 @@
 # 📱 CryptoPulse
 
-CryptoPulseApp is a React Native mobile application with a Python Flask backend that allows users to track cryptocurrency prices and receive custom notifications about their favorite coins.
+CryptoPulseApp is a React Native mobile application with a Python FastAPI backend that allows users to track cryptocurrency prices and receive custom notifications about their favorite coins.
 The app integrates with the CoinGecko API to fetch up to 30 cryptocurrencies and provides a clean, modern interface with authentication, scheduling, and dark mode support.
 
 [![Python](https://img.shields.io/badge/python-3.12.9-blue)](https://www.python.org/)
