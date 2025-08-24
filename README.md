@@ -9,14 +9,42 @@ The app integrates with the CoinGecko API to fetch up to 30 cryptocurrencies and
 # 📸 Screenshots / Demo
 <!-- Replace with actual images or video links -->
 
-📱 Home Screen – Live prices and changes
+## 📱 Home Screen – Live prices and changes
+<div style="display: flex; gap: 10px;">
+  <img src="demo/home_light.jpeg" alt="home light" width="300"/>
+  <img src="demo/home_dark.jpeg" alt="home dark" width="300"/>
+</div>
 
-⭐ Favorites – Track your chosen coins
+## ⭐ Favorites – Track your chosen coins
+<div style="display: flex; gap: 10px;">
+  <img src="demo/fav_light.jpeg" alt="favorites light" width="300"/>
+  <img src="demo/fav_dark.jpeg" alt="favorites dark" width="300"/>
+</div>
 
-🔔 Notifications – Flexible scheduling
+## 🔔 Notifications – Flexible scheduling
+<div style="display: flex; gap: 10px;">
+  <img src="demo/notification_light.jpeg" alt="notifications light" width="300"/>
+  <img src="demo/notification_dark.jpeg" alt="notifications dark" width="300"/>
+</div>
 
-🌙 Dark Mode – Modern UI experience
+## 🕙 Logs – Modern UI experience
+<div style="display: flex; gap: 10px;">
+  <img src="demo/logs_light.jpeg" alt="logs light" width="300"/>
+  <img src="demo/logs_dark.jpeg" alt="logs dark" width="300"/>
+</div>
 
+## 🛠️ Settings
+<div style="display: flex; gap: 10px;">
+  <img src="demo/settings_light.jpeg" alt="settings light" width="300"/>
+  <img src="demo/settings_dark.jpeg" alt="settings dark" width="300"/>
+</div>
+
+## 📱 Push Notification
+<img src="demo/push_notification.jpeg" alt="push notification" width="300"/>
+
+## 👨‍💻 SignIn / SignUp
+<div style="display: flex; gap: 10px;">
+  
 
 ## ✨ Features
 
