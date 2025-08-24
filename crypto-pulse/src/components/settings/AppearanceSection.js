@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../constants/theme';
 
 const AppearanceSection = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme, isDarkMode, toggleTheme } = useTheme();
   const [animation] = useState(new Animated.Value(0));
 
-  const handleDarkModeToggle = () => {
-    const newValue = !isDarkMode;
-    setIsDarkMode(newValue);
-    
+  // Update animation when theme changes
+  useEffect(() => {
     Animated.timing(animation, {
-      toValue: newValue ? 1 : 0,
+      toValue: isDarkMode ? 1 : 0,
       duration: 200,
       useNativeDriver: false,
     }).start();
-    
-    console.log('Dark mode toggled:', newValue);
+  }, [isDarkMode]);
+
+  const handleDarkModeToggle = () => {
+    toggleTheme();
   };
 
   const translateX = animation.interpolate({
@@ -26,7 +27,85 @@ const AppearanceSection = () => {
 
   const trackColor = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#E5E7EB', '#8663EC'], // Gray to green
+    outputRange: [theme.borderLight, theme.accent], // Gray to accent color
+  });
+
+  const styles = StyleSheet.create({
+    section: {
+      marginTop: 30,
+      paddingHorizontal: 16,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: 15,
+    },
+    appearanceItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      padding: 15,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.border,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    appearanceLeft: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    moonIconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.surfaceElevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    appearanceContent: {
+      flex: 1,
+    },
+    appearanceTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 2,
+    },
+    appearanceSubtitle: {
+      fontSize: 14,
+      color: theme.textSecondary,
+    },
+    switchContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    switchTrack: {
+      width: 60,
+      height: 30,
+      borderRadius: 17,
+      justifyContent: 'center',
+      position: 'relative',
+    },
+    switchThumb: {
+      width: 20,
+      height: 20,
+      borderRadius: 14,
+      backgroundColor: '#FFFFFF',
+      position: 'absolute',
+      left: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 3,
+    },
   });
 
   return (
@@ -35,7 +114,11 @@ const AppearanceSection = () => {
       <View style={styles.appearanceItem}>
         <View style={styles.appearanceLeft}>
           <View style={styles.moonIconContainer}>
-            <Ionicons name="moon" size={24} color="#000" />
+            <Ionicons 
+              name="moon" 
+              size={24} 
+              color={isDarkMode ? theme.text : '#000'} 
+            />
           </View>
           <View style={styles.appearanceContent}>
             <Text style={styles.appearanceTitle}>Color Theme</Text>
@@ -56,84 +139,5 @@ const AppearanceSection = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  section: {
-    marginTop: 30,
-    paddingHorizontal: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 15,
-  },
-  appearanceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  appearanceLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  moonIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F2F2F7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  appearanceContent: {
-    flex: 1,
-  },
-  appearanceTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 2,
-  },
-  appearanceSubtitle: {
-    fontSize: 14,
-    color: '#8E8E93',
-  },
-  switchContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  switchTrack: {
-    width: 60,
-    height: 30,
-    borderRadius: 17,
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  switchThumb: {
-    width: 20,
-    height: 20,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    position: 'absolute',
-    left: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-});
 
 export default AppearanceSection;
