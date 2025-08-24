@@ -1,9 +1,11 @@
+// App.js
 import React from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
 
 import 'react-native-url-polyfill/auto'
 import { createClient } from '@supabase/supabase-js'
 import { UserProvider } from '@/context/UserContext';
+import { ThemeProvider } from '@/constants/theme';
 
 console.log('=== Environment Variables Debug ===');
 console.log('EXPO_PUBLIC_SUPABASE_URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
@@ -22,8 +24,10 @@ export const supabase = createClient(
 
 export default function App() {
   return (
-    <UserProvider>
-      <AppNavigator />
-    </UserProvider>
+    <ThemeProvider>
+      <UserProvider>
+        <AppNavigator />
+      </UserProvider>
+    </ThemeProvider>
   );
 }
