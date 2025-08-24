@@ -2,16 +2,52 @@
 import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../constants/theme';
 
 const SearchBar = ({ value, onChangeText, placeholder = "Search..." }) => {
+  const { theme } = useTheme();
+
+  const themedStyles = StyleSheet.create({
+    container: {
+      paddingHorizontal: 0,
+      paddingVertical: 3,
+      backgroundColor: theme.surfaceElevated, // #F3F4F6 in light mode
+      marginTop: 15,
+      marginHorizontal: 20,
+      borderRadius: 15,
+    },
+    searchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.inputBackground, // #F5F5F5 in light mode
+      borderRadius: 10,
+      paddingHorizontal: 15,
+      height: 45,
+    },
+    searchIcon: {
+      marginRight: 10,
+      color: theme.searchIconColor, // #ADAEBC in light mode
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 16,
+      color: theme.inputText, // #ADAEBC in light mode
+    },
+  });
+
   return (
-    <View style={styles.container}>
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={20} color="#9E9E9E" style={styles.searchIcon} />
+    <View style={themedStyles.container}>
+      <View style={themedStyles.searchBar}>
+        <Ionicons 
+          name="search" 
+          size={20} 
+          color={theme.searchIconColor} 
+          style={themedStyles.searchIcon} 
+        />
         <TextInput
-          style={styles.searchInput}
+          style={themedStyles.searchInput}
           placeholder={placeholder}
-          placeholderTextColor="#9E9E9E"
+          placeholderTextColor={theme.inputPlaceholder} // #ADAEBC in light mode
           value={value}
           onChangeText={onChangeText}
         />
@@ -19,33 +55,5 @@ const SearchBar = ({ value, onChangeText, placeholder = "Search..." }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 0,
-    paddingVertical: 3,
-    backgroundColor: '#F3F4F6',
-    marginTop: 15,
-    marginHorizontal: 20,
-    borderRadius: 15,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    height: 45,
-  },
-  searchIcon: {
-    marginRight: 10,
-    color: '#ADAEBC',
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#ADAEBC',
-  },
-});
 
 export default SearchBar;
